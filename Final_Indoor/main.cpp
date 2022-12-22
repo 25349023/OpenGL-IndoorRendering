@@ -296,6 +296,7 @@ bool initializeGL()
     {
         return false;
     }
+    defaultRenderer->setViewport(0, 0, FRAME_WIDTH, FRAME_HEIGHT);
 
     // =================================================================
     // initialize camera
@@ -404,10 +405,8 @@ void paintGL()
     updatePlayerViewMat();
     // ===============================
     // start new frame
-    defaultRenderer->setViewport(0, 0, FRAME_WIDTH, FRAME_HEIGHT);
     defaultRenderer->startNewFrame();
 
-    // rendering with player view
     defaultRenderer->setProjection(playerProjMat);
     defaultRenderer->setView(playerViewMat);
     defaultRenderer->renderPass();
