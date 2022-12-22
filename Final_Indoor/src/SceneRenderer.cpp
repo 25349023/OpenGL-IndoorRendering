@@ -20,11 +20,6 @@ void SceneRenderer::renderPass()
     glUniform4fv(manager->m_lightPositionInViewHandle, 1, glm::value_ptr(lightDirInView));
     glUniformMatrix4fv(manager->m_projMatHandle, 1, false, glm::value_ptr(this->m_projMat));
     glUniformMatrix4fv(manager->m_viewMatHandle, 1, false, glm::value_ptr(this->m_viewMat));
-
-    for (DynamicSceneObject* obj : this->m_sceneObjects)
-    {
-        obj->update();
-    }
 }
 
 void SceneRenderer::useProgram()
@@ -74,11 +69,6 @@ void SceneRenderer::setDirectionalLightDir(const glm::vec4& dir)
 void SceneRenderer::setViewport(const int x, const int y, const int w, const int h)
 {
     glViewport(x, y, w, h);
-}
-
-void SceneRenderer::appendObject(DynamicSceneObject* obj)
-{
-    this->m_sceneObjects.push_back(obj);
 }
 
 void SceneRenderer::clear(const glm::vec4& clearColor, const float depth)

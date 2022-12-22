@@ -20,8 +20,8 @@
 #pragma comment (lib, "lib-vc2015\\glfw3.lib")
 #pragma comment(lib, "assimp-vc141-mt.lib")
 
-int FRAME_WIDTH = 1024;
-int FRAME_HEIGHT = 512;
+int FRAME_WIDTH = 768;
+int FRAME_HEIGHT = 576;
 
 void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
 void mouseScrollCallback(GLFWwindow* window, double xoffset, double yoffset);
@@ -407,16 +407,7 @@ void paintGL()
     defaultRenderer->setViewport(0, 0, FRAME_WIDTH, FRAME_HEIGHT);
     defaultRenderer->startNewFrame();
 
-    // rendering with god view
-    const int HALF_W = FRAME_WIDTH * 0.5;
-    defaultRenderer->setViewport(0, 0, HALF_W, FRAME_HEIGHT);
-    defaultRenderer->setProjection(godProjMat);
-    defaultRenderer->setView(godViewMat);
-    defaultRenderer->renderPass();
-    drawGrass();
-
     // rendering with player view
-    defaultRenderer->setViewport(HALF_W, 0, HALF_W, FRAME_HEIGHT);
     defaultRenderer->setProjection(playerProjMat);
     defaultRenderer->setView(playerViewMat);
     defaultRenderer->renderPass();
