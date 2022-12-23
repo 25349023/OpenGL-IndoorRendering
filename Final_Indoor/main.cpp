@@ -55,7 +55,7 @@ ShaderProgram* defaultShaderProgram = new ShaderProgram();
 glm::mat4 playerProjMat;
 glm::mat4 playerViewMat;
 
-glm::vec3 playerEye(0.0, 9.0, 10.0), playerCenter(0.0, 9.0, 0.0), playerUp(0.0, 1.0, 0.0);
+glm::vec3 playerUp(0.0, 1.0, 0.0);
 glm::vec3 playerLocalZ(0, 0, -1), playerLocalY(0, 1, 0);
 
 // ==============================================
@@ -65,7 +65,7 @@ Model scene;
 GLuint vao, raw_ssbo, valid_ssbo, drawCmd_ssbo;
 
 enum Key { KEY_W, KEY_A, KEY_S, KEY_D, KEY_Z, KEY_X };
-bool keyDown[6] = { };
+bool keyDown[6] = {};
 // ==============================================
 
 int main()
@@ -110,6 +110,11 @@ int main()
     ImGuiIO& io = ImGui::GetIO();
     (void)io;
     ImGui::StyleColorsDark();
+
+    ImFontConfig config;
+    config.SizePixels = 18;
+    io.Fonts->AddFontDefault(&config);
+
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 430");
 
@@ -188,6 +193,9 @@ bool initializeGL()
     delete fsShader;
 
     // =================================================================
+    m_imguiPanel = new MyImGuiPanel();
+
+    // =================================================================
     // init renderer
     defaultRenderer = new SceneRenderer();
     if (!defaultRenderer->initialize(FRAME_WIDTH, FRAME_HEIGHT, shaderProgram))
@@ -204,10 +212,7 @@ bool initializeGL()
 
     defaultRenderer->setDirectionalLightDir(directionalLightDir);
 
-    // =================================================================
     resize(FRAME_WIDTH, FRAME_HEIGHT);
-    m_imguiPanel = new MyImGuiPanel();
-
     // =================================================================	
     // load objs, init buffers
     initScene();
@@ -228,45 +233,45 @@ void updatePlayerViewMat()
 
     if (keyDown[KEY_W])
     {
-        playerEye += translateZAmount;
-        playerCenter += translateZAmount;
+        m_imguiPanel->camEye += translateZAmount;
+        m_imguiPanel->camCenter += translateZAmount;
     }
     else if (keyDown[KEY_S])
     {
-        playerEye -= translateZAmount;
-        playerCenter -= translateZAmount;
+        m_imguiPanel->camEye -= translateZAmount;
+        m_imguiPanel->camCenter -= translateZAmount;
     }
 
     if (keyDown[KEY_Z])
     {
-        playerEye += translateYAmount;
-        playerCenter += translateYAmount;
+        m_imguiPanel->camEye += translateYAmount;
+        m_imguiPanel->camCenter += translateYAmount;
     }
     else if (keyDown[KEY_X])
     {
-        playerEye -= translateYAmount;
-        playerCenter -= translateYAmount;
+        m_imguiPanel->camEye -= translateYAmount;
+        m_imguiPanel->camCenter -= translateYAmount;
     }
 
     if (keyDown[KEY_A])
     {
-        playerCenter = rotateCenterAccordingToEye(
-            playerCenter, playerEye, playerViewMat, glm::radians(rotateSpeed));
+        m_imguiPanel->camCenter = rotateCenterAccordingToEye(
+            m_imguiPanel->camCenter, m_imguiPanel->camEye, playerViewMat, glm::radians(rotateSpeed));
         recalculatePlayerLocals();
     }
     else if (keyDown[KEY_D])
     {
-        playerCenter = rotateCenterAccordingToEye(
-            playerCenter, playerEye, playerViewMat, glm::radians(-rotateSpeed));
+        m_imguiPanel->camCenter = rotateCenterAccordingToEye(
+            m_imguiPanel->camCenter, m_imguiPanel->camEye, playerViewMat, glm::radians(-rotateSpeed));
         recalculatePlayerLocals();
     }
 
-    playerViewMat = glm::lookAt(playerEye, playerCenter, playerUp);
+    playerViewMat = glm::lookAt(m_imguiPanel->camEye, m_imguiPanel->camCenter, playerUp);
 }
 
 void recalculatePlayerLocals()
 {
-    playerLocalZ = playerCenter - playerEye;
+    playerLocalZ = m_imguiPanel->camCenter - m_imguiPanel->camEye;
     playerLocalZ.y = 0;
     playerLocalZ = glm::normalize(playerLocalZ);
 
@@ -335,7 +340,7 @@ void paintGL()
     drawScene();
     // ===============================
 
-    ImGui::Begin("FPS Info");
+    ImGui::Begin("Toolbox");
     m_imguiPanel->update();
     ImGui::End();
 
@@ -371,8 +376,7 @@ void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
 }
 
 void cursorPosCallback(GLFWwindow* window, double x, double y)
-{
-}
+{}
 
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
@@ -400,8 +404,7 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 }
 
 void mouseScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
-{
-}
+{}
 
 void resize(const int w, const int h)
 {
