@@ -31,7 +31,7 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 void gameLoop(GLFWwindow* window);
 
 void updatePlayerViewMat();
-void recalculateLocalZ();
+void recalculatePlayerLocals();
 bool initializeGL();
 void resizeGL(GLFWwindow* window, int w, int h);
 void paintGL();
@@ -56,19 +56,16 @@ glm::mat4 playerProjMat;
 glm::mat4 playerViewMat;
 
 glm::vec3 playerEye(0.0, 9.0, 10.0), playerCenter(0.0, 9.0, 0.0), playerUp(0.0, 1.0, 0.0);
-glm::vec3 playerLocalZ(0, 0, -1);
+glm::vec3 playerLocalZ(0, 0, -1), playerLocalY(0, 1, 0);
 
 // ==============================================
 
 Model scene;
-int numSamples[3];
-const float* samplePositions[3];
-int totalInstanceCount;
 
 GLuint vao, raw_ssbo, valid_ssbo, drawCmd_ssbo;
 
-enum Key { KEY_W, KEY_A, KEY_S, KEY_D };
-bool keyDown[4] = { false, false, false, false };
+enum Key { KEY_W, KEY_A, KEY_S, KEY_D, KEY_Z, KEY_X };
+bool keyDown[6] = { };
 // ==============================================
 
 int main()
@@ -156,97 +153,8 @@ void gameLoop(GLFWwindow* window)
 
 void initScene()
 {
-    // [TODO] load texture
     scene = Model("assets/indoor/Grey_White_Room.obj", "assets/indoor/");
 }
-
-struct InstanceProperties
-{
-    glm::vec4 position;
-};
-
-void initSSBO()
-{
-    InstanceProperties* rawInsData = new InstanceProperties[totalInstanceCount];
-
-    for (int i = 0, j = 0; j < 3; ++j)
-    {
-        auto positions = samplePositions[j];
-        for (int k = 0; k < numSamples[j]; ++i, ++k)
-        {
-            rawInsData[i].position = glm::vec4(
-                positions[k * 3],
-                positions[k * 3 + 1],
-                positions[k * 3 + 2], j);
-        }
-    }
-
-    glGenBuffers(1, &raw_ssbo);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, raw_ssbo);
-    glBufferStorage(GL_SHADER_STORAGE_BUFFER, totalInstanceCount * 4 * sizeof(int),
-        rawInsData, GL_MAP_READ_BIT);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, raw_ssbo);
-
-    glGenBuffers(1, &valid_ssbo);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, valid_ssbo);
-    glBufferStorage(GL_SHADER_STORAGE_BUFFER, totalInstanceCount * 4 * sizeof(int),
-        nullptr, GL_MAP_READ_BIT);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, valid_ssbo);
-}
-
-void initInstancedSettings()
-{
-    GLuint offsetHandel = SceneManager::Instance()->m_offsetHandel;
-
-    // glBindVertexArray(mergedGrass.shape.vao);
-    glBindBuffer(GL_ARRAY_BUFFER, valid_ssbo);
-    glEnableVertexAttribArray(offsetHandel);
-    glVertexAttribPointer(offsetHandel, 4, GL_FLOAT, GL_FALSE, 0, nullptr);
-    glVertexAttribDivisor(offsetHandel, 1);
-
-    glBindVertexArray(0);
-}
-
-struct DrawCommand
-{
-    unsigned int count;
-    unsigned int instanceCount;
-    unsigned int firstIndex;
-    unsigned int baseVertex;
-    unsigned int baseInstance;
-};
-
-// void genDrawCommands()
-// {
-//     const int numCmd = 3;
-//     DrawCommand cmdList[numCmd];
-//
-//     unsigned int offset = 0;
-//     unsigned int baseInst = 0;
-//
-//     for (int i = 0; i < numCmd; i++)
-//     {
-//         cmdList[i].count = mergedGrass.drawCounts[i];
-//         cmdList[i].instanceCount = numSamples[i];
-//         cmdList[i].firstIndex = offset;
-//         cmdList[i].baseVertex = mergedGrass.baseVertices[i];
-//         cmdList[i].baseInstance = baseInst;
-//
-//         offset += mergedGrass.drawCounts[i];
-//         baseInst += numSamples[i];
-//     }
-//
-//     GLuint indirectBufHandle;
-//
-//     glGenBuffers(1, &indirectBufHandle);
-//     glBindBuffer(GL_SHADER_STORAGE_BUFFER, indirectBufHandle);
-//     glBufferStorage(GL_SHADER_STORAGE_BUFFER, sizeof(DrawCommand) * numCmd, cmdList, GL_MAP_READ_BIT);
-//     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, indirectBufHandle);
-//
-//     glBindVertexArray(mergedGrass.shape.vao);
-//     glBindBuffer(GL_DRAW_INDIRECT_BUFFER, indirectBufHandle);
-//     glBindVertexArray(0);
-// }
 
 bool initializeGL()
 {
@@ -303,9 +211,6 @@ bool initializeGL()
     // =================================================================	
     // load objs, init buffers
     initScene();
-    // initSSBO();
-    // initInstancedSettings();
-    // genDrawCommands();
 
     return true;
 }
@@ -318,40 +223,55 @@ void resizeGL(GLFWwindow* window, int w, int h)
 void updatePlayerViewMat()
 {
     const float translateSpeed = 0.01f, rotateSpeed = 0.05f;
-    const glm::vec3 translateAmount = translateSpeed * playerLocalZ;
+    const glm::vec3 translateZAmount = translateSpeed * playerLocalZ;
+    const glm::vec3 translateYAmount = translateSpeed * playerLocalY;
 
     if (keyDown[KEY_W])
     {
-        playerEye += translateAmount;
-        playerCenter += translateAmount;
+        playerEye += translateZAmount;
+        playerCenter += translateZAmount;
     }
     else if (keyDown[KEY_S])
     {
-        playerEye -= translateAmount;
-        playerCenter -= translateAmount;
+        playerEye -= translateZAmount;
+        playerCenter -= translateZAmount;
+    }
+
+    if (keyDown[KEY_Z])
+    {
+        playerEye += translateYAmount;
+        playerCenter += translateYAmount;
+    }
+    else if (keyDown[KEY_X])
+    {
+        playerEye -= translateYAmount;
+        playerCenter -= translateYAmount;
     }
 
     if (keyDown[KEY_A])
     {
         playerCenter = rotateCenterAccordingToEye(
             playerCenter, playerEye, playerViewMat, glm::radians(rotateSpeed));
-        recalculateLocalZ();
+        recalculatePlayerLocals();
     }
     else if (keyDown[KEY_D])
     {
         playerCenter = rotateCenterAccordingToEye(
             playerCenter, playerEye, playerViewMat, glm::radians(-rotateSpeed));
-        recalculateLocalZ();
+        recalculatePlayerLocals();
     }
 
     playerViewMat = glm::lookAt(playerEye, playerCenter, playerUp);
 }
 
-void recalculateLocalZ()
+void recalculatePlayerLocals()
 {
     playerLocalZ = playerCenter - playerEye;
     playerLocalZ.y = 0;
     playerLocalZ = glm::normalize(playerLocalZ);
+
+    glm::vec3 side = glm::cross(playerLocalZ, playerUp);
+    playerLocalY = glm::normalize(glm::cross(side, playerLocalZ));
 }
 
 void drawScene()
@@ -452,22 +372,6 @@ void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
 
 void cursorPosCallback(GLFWwindow* window, double x, double y)
 {
-    // if (leftButtonPressed)
-    // {
-    //     using namespace glm;
-    //     glm::vec2 changed = glm::vec2(x, y) - lastCursorPos;
-    //     vec2 change = 0.2f * (lastCursorPos - vec2(x, y));
-    //
-    //     int sign = (godViewDir.z > 0) ? -1 : 1;
-    //     mat4 R = mat4_cast(quat(vec3(radians(sign * change.y), radians(change.x), 0)));
-    //
-    //     godViewDir = (R * vec4(godViewDir, 1)).xyz;
-    //
-    //     godLocalZ = (R * vec4(godLocalZ, 1)).xyz;
-    //     godLocalX = normalize(cross(godUp, godLocalZ));
-    //     godLocalY = normalize(cross(godLocalZ, godLocalX));
-    // }
-    // lastCursorPos = glm::vec2(x, y);
 }
 
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
@@ -486,13 +390,17 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
     case GLFW_KEY_D:
         keyDown[KEY_D] = action != GLFW_RELEASE;
         break;
+    case GLFW_KEY_Z:
+        keyDown[KEY_Z] = action != GLFW_RELEASE;
+        break;
+    case GLFW_KEY_X:
+        keyDown[KEY_X] = action != GLFW_RELEASE;
+        break;
     }
 }
 
 void mouseScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
 {
-    // printf("%f, %f\n", xoffset, yoffset);
-    // godEye += (float)yoffset * godLocalZ;
 }
 
 void resize(const int w, const int h)

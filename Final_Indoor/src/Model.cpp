@@ -26,7 +26,6 @@ void Model::loadMeshes(const char* path)
     std::cout << "There are " << model->mNumMeshes << " meshes." << std::endl;
     std::cout << "There are " << model->mNumMaterials << " materials." << std::endl;
 
-    // [TODO] extract from multiple meshes
     for (unsigned int i = 0; i < model->mNumMeshes; ++i)
     {
         const aiMesh* mesh = model->mMeshes[i];
