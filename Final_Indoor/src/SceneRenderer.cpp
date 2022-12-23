@@ -32,6 +32,7 @@ void SceneRenderer::resize(const int w, const int h)
 {
     this->m_frameWidth = w;
     this->m_frameHeight = h;
+    setViewport(0, 0, this->m_frameWidth, this->m_frameHeight);
 }
 
 bool SceneRenderer::initialize(const int w, const int h, ShaderProgram* shaderProgram)

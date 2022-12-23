@@ -20,8 +20,8 @@
 #pragma comment (lib, "lib-vc2015\\glfw3.lib")
 #pragma comment(lib, "assimp-vc141-mt.lib")
 
-int FRAME_WIDTH = 768;
-int FRAME_HEIGHT = 576;
+int FRAME_WIDTH = 960;
+int FRAME_HEIGHT = 640;
 
 void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
 void mouseScrollCallback(GLFWwindow* window, double xoffset, double yoffset);
@@ -55,7 +55,7 @@ ShaderProgram* defaultShaderProgram = new ShaderProgram();
 glm::mat4 playerProjMat;
 glm::mat4 playerViewMat;
 
-glm::vec3 playerEye(0.0, 4.0, 10.0), playerCenter(0.0, 5.0, 0.0), playerUp(0.0, 1.0, 0.0);
+glm::vec3 playerEye(0.0, 9.0, 10.0), playerCenter(0.0, 9.0, 0.0), playerUp(0.0, 1.0, 0.0);
 glm::vec3 playerLocalZ(0, 0, -1);
 
 // ==============================================
@@ -363,12 +363,12 @@ void drawScene()
     glUniform1i(sm->m_fs_albedoTexHandle, 0);
 
     glm::mat4 id(1);
-    id = glm::scale(id, glm::vec3(5.0));
-    glm::quat q = glm::angleAxis(glm::radians(-90.0f), glm::vec3(0.0, 1.0, 0.0));
+    id = glm::scale(id, glm::vec3(10.0));
+    glm::quat q = glm::angleAxis(glm::radians(-80.0f), glm::vec3(0.0, 1.0, 0.0));
     glm::mat4 rotMat = glm::toMat4(q);
 
     id = rotMat * id;
-    id = glm::translate(id, glm::vec3(-2.5, 0.0, 1.5));
+    id = glm::translate(id, glm::vec3(-3.5, 0.0, 1.5));
     glUniformMatrix4fv(sm->m_modelMatHandle, 1, false, glm::value_ptr(id));
 
     for (const auto& shape : scene.shapes)
@@ -396,21 +396,6 @@ void drawScene()
         glDrawElements(GL_TRIANGLES, shape.drawCount, GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
     }
-
-    // glBindVertexArray(scene.shape.vao);
-    //
-    // glActiveTexture(sm->m_albedoTexUnit);
-    // glUniform1i(sm->m_fs_albedoTexHandle, 0);
-    // glBindTexture(GL_TEXTURE_2D_ARRAY, scene.material.diffuse_tex);
-    //
-    // glUniform1i(sm->m_fs_pixelProcessIdHandle, sm->m_fs_textureMapping);
-    // glm::mat4 id(1);
-    // glUniformMatrix4fv(sm->m_modelMatHandle, 1, false, glm::value_ptr(id));
-    //
-    // glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, NULL, 3, 0);
-    //
-    // glBindVertexArray(0);
-    // glUniform1i(sm->m_instancedDrawHandle, 0);
 }
 
 void paintGL()

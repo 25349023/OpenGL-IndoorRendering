@@ -59,7 +59,6 @@ void Model::loadMaterials(const char* asset_root)
             char full_path[96] = "";
             strncpy(full_path, asset_root, 45);
             strncat(full_path, texturePath.C_Str(), 45);
-            std::cout << full_path << std::endl;
 
             material.bindTexture(full_path);
         }

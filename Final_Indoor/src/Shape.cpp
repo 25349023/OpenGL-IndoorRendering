@@ -11,7 +11,7 @@ void Shape::extractMeshData(const aiMesh* mesh)
         vertex.normal = glm::vec3(mesh->mNormals[v].x, mesh->mNormals[v].y, mesh->mNormals[v].z);
         if (mesh->HasTextureCoords(0))
         {
-            vertex.tex_coords = glm::vec3(mesh->mTextureCoords[0][v].x, mesh->mTextureCoords[0][v].y, 0.0);
+            vertex.texCoords = glm::vec3(mesh->mTextureCoords[0][v].x, mesh->mTextureCoords[0][v].y, 0.0);
         }
         vertices.push_back(vertex);
     }
@@ -21,6 +21,11 @@ void Shape::extractMeshIndices(const aiMesh* mesh)
 {
     for (unsigned int f = 0; f < mesh->mNumFaces; ++f)
     {
+        if (mesh->mFaces[f].mNumIndices < 3)
+        {
+            continue;
+        }
+        
         unsigned int* idx = mesh->mFaces[f].mIndices;
         indices.insert(indices.end(), idx, idx + 3);
     }
@@ -39,7 +44,7 @@ void Shape::bindBuffers()
     SceneManager* sm = SceneManager::Instance();
     glVertexAttribPointer(sm->m_vertexHandle, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
     glVertexAttribPointer(sm->m_normalHandle, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
-    glVertexAttribPointer(sm->m_uvHandle, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, tex_coords));
+    glVertexAttribPointer(sm->m_uvHandle, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texCoords));
 
     glEnableVertexAttribArray(sm->m_vertexHandle);
     glEnableVertexAttribArray(sm->m_normalHandle);
