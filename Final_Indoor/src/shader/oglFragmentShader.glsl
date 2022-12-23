@@ -9,7 +9,12 @@ in vec3 f_uv;
 layout (location = 0) out vec4 fragColor;
 
 uniform int pixelProcessId;
-uniform sampler2DArray albedoTex;
+uniform sampler2D albedoTex;
+
+uniform vec3 ka;
+uniform vec3 kd;
+uniform vec3 ks;
+
 uniform vec3 lightAmbient = vec3(0.2);
 uniform vec3 lightDiffuse = vec3(0.64);
 uniform vec3 lightSpecular = vec3(0.16);
@@ -52,11 +57,15 @@ void pureColor() {
 }
 
 void texture_mapping() {
-    vec4 texel = texture(albedoTex, f_uv);
-    if (texel.a < 0.3) {
+    vec4 texel = texture(albedoTex, f_uv.xy);
+    if (texel.a < 0.5) {
         discard;
     }
     fragColor = texel;
+}
+
+void simple_shading() {
+    fragColor = vec4(kd, 1.0);
 }
 
 void phong_shading() {
@@ -68,7 +77,7 @@ void phong_shading() {
     vec4 albedo;
     vec3 k_s;
     if (pixelProcessId == 1) {
-        albedo = texture(albedoTex, f_uv);
+        albedo = texture(albedoTex, f_uv.xy);
         if (albedo.a < 0.3) {
             discard;
         }
@@ -86,13 +95,10 @@ void phong_shading() {
 }
 
 void main() {
-    if (pixelProcessId == 1 || pixelProcessId == 8) {
-        phong_shading();
+    if (pixelProcessId == 1) {
+        texture_mapping();
     }
-    else if (pixelProcessId == 4) {
-        proceduralPlane();
-    }
-    else if (pixelProcessId == 5) {
-        pureColor();
+    else if (pixelProcessId == 2) {
+        simple_shading();
     }
 }

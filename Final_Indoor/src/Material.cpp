@@ -19,12 +19,26 @@ texture_data loadImg(const char* path)
     return texture;
 }
 
+void Material::extractColorCoef(aiMaterial* aiMaterial)
+{
+    aiColor3D color(0.f, 0.f, 0.f);
+
+    aiMaterial->Get(AI_MATKEY_COLOR_AMBIENT, color);
+    ambient = glm::vec3(color.r, color.g, color.b);
+
+    aiMaterial->Get(AI_MATKEY_COLOR_DIFFUSE, color);
+    diffuse = glm::vec3(color.r, color.g, color.b);
+    
+    aiMaterial->Get(AI_MATKEY_COLOR_SPECULAR, color);
+    specular = glm::vec3(color.r, color.g, color.b);
+}
+
 void Material::bindTexture(const char* path)
 {
     texture = loadImg(path);
 
-    glGenTextures(1, &diffuse_tex);
-    glBindTexture(GL_TEXTURE_2D, diffuse_tex);
+    glGenTextures(1, &diffuseTex);
+    glBindTexture(GL_TEXTURE_2D, diffuseTex);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, texture.width, texture.height, 0,
         GL_RGBA, GL_UNSIGNED_BYTE, texture.data);
     glGenerateMipmap(GL_TEXTURE_2D);
@@ -33,19 +47,6 @@ void Material::bindTexture(const char* path)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-}
 
-void Material::bindTexture2DArray(int numTex)
-{
-    glGenTextures(1, &diffuse_tex);
-    glBindTexture(GL_TEXTURE_2D_ARRAY, diffuse_tex);
-    // the internal format for glTexStorageXD must be "Sized Internal Formats"
-    glTexStorage3D(GL_TEXTURE_2D_ARRAY, 1, GL_RGBA32F, texture.width, texture.height, numTex);
-    glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, 0, texture.width, texture.height, numTex,
-        GL_RGBA, GL_UNSIGNED_BYTE, texture.data);
-    
-    glTexParameterf(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameterf(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameterf(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameterf(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    hasTex = true;
 }

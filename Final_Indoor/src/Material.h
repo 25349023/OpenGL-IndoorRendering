@@ -1,6 +1,9 @@
 ﻿#pragma once
 
 
+#include <assimp/material.h>
+#include <glm/vec3.hpp>
+
 #include "glad/glad.h"
 
 typedef struct _texture_data
@@ -16,10 +19,16 @@ texture_data loadImg(const char* path);
 struct Material
 {
     texture_data texture;
-    GLuint diffuse_tex{};
+    GLuint diffuseTex{};
+
+    glm::vec3 ambient{};
+    glm::vec3 diffuse{};
+    glm::vec3 specular{};
+
+    bool hasTex{false};
 
     Material() = default;
     
+    void extractColorCoef(aiMaterial* aiMaterial);
     void bindTexture(const char* path);
-    void bindTexture2DArray(int numTex);
 };

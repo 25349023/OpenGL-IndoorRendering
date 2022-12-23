@@ -128,15 +128,12 @@ bool SceneRenderer::setUpShader()
     manager->m_fs_pixelProcessIdHandle = glGetUniformLocation(programId, "pixelProcessId");
     manager->m_fs_commonProcess = 0;
     manager->m_fs_textureMapping = 1;
-    manager->m_fs_gaussianX = 2;
-    manager->m_fs_gaussianY = 3;
-    manager->m_fs_proceduralPlane = 4;
-    manager->m_fs_pureColor = 5;
-    manager->m_fs_textureMappingWithTextureArray = 6;
-    manager->m_fs_finalPass = 7;
-    manager->m_fs_slime = 8;
+    manager->m_fs_simpleShading = 2;
 
     manager->m_fs_albedoTexHandle = glGetUniformLocation(programId, "albedoTex");
+    manager->m_fs_kaHandle = glGetUniformLocation(programId, "ka");
+    manager->m_fs_kdHandle = glGetUniformLocation(programId, "kd");
+    manager->m_fs_ksHandle = glGetUniformLocation(programId, "ks");
 
     return true;
 }

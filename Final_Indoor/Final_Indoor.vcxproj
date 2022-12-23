@@ -54,16 +54,25 @@
     <ClInclude Include="src\Shape.h" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="assets\bush01.png" />
-    <Content Include="assets\bush01_lod2.obj" />
-    <Content Include="assets\bush05.png" />
-    <Content Include="assets\bush05_lod2.obj" />
-    <Content Include="assets\grassB.obj" />
-    <Content Include="assets\grassB_albedo.png" />
-    <Content Include="assets\poissonPoints_1010.ppd" />
-    <Content Include="assets\poissonPoints_155304.ppd" />
-    <Content Include="assets\poissonPoints_2797.ppd" />
-    <Content Include="assets\slime.obj" />
+    <Content Include="assets\indoor\Grey_White_Room.mtl" />
+    <Content Include="assets\indoor\Grey_White_Room.obj" />
+    <Content Include="assets\indoor\models\textures\Abstract Art 05.jpg" />
+    <Content Include="assets\indoor\models\textures\Gravel0109_1_S.jpg" />
+    <Content Include="assets\indoor\models\textures\leaf.jpg" />
+    <Content Include="assets\indoor\models\textures\leaf.png" />
+    <Content Include="assets\indoor\models\textures\leafd.png" />
+    <Content Include="assets\indoor\models\textures\leafm.png" />
+    <Content Include="assets\indoor\models\textures\marble.jpg" />
+    <Content Include="assets\indoor\models\textures\smirnoff label mask.png" />
+    <Content Include="assets\indoor\models\textures\smirnoff label.png" />
+    <Content Include="assets\indoor\models\textures\smirnoffcap label mask.png" />
+    <Content Include="assets\indoor\models\textures\smirnoffcap label.png" />
+    <Content Include="assets\indoor\models\textures\smirnoffcap_label.png" />
+    <Content Include="assets\indoor\models\textures\smirnoff_label.png" />
+    <Content Include="assets\indoor\models\textures\WoodFine0036_L.jpg" />
+    <Content Include="assets\indoor\trice.mtl" />
+    <Content Include="assets\indoor\trice.obj" />
+    <Content Include="assets\indoor\tricnorm.jpg" />
     <Content Include="src\shader\oglComputeShader.glsl" />
     <Content Include="src\shader\oglFragmentShader.glsl" />
     <Content Include="src\shader\oglResetParamShader.glsl" />

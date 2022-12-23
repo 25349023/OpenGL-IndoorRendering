@@ -26,6 +26,7 @@ struct Shape
     std::vector<unsigned int> indices;
 
     unsigned int drawCount;
+    unsigned int materialId;
 
     Shape(): vao(0), vbo(0), ibo(0), drawCount(0) {}
 

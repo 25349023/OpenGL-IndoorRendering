@@ -30,7 +30,6 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 
 void gameLoop(GLFWwindow* window);
 
-void updateGodViewMat();
 void updatePlayerViewMat();
 void recalculateLocalZ();
 bool initializeGL();
@@ -53,19 +52,15 @@ MyImGuiPanel* m_imguiPanel = nullptr;
 SceneRenderer* defaultRenderer = nullptr;
 ShaderProgram* defaultShaderProgram = new ShaderProgram();
 
-glm::mat4 godProjMat;
-glm::mat4 godViewMat;
 glm::mat4 playerProjMat;
 glm::mat4 playerViewMat;
 
-glm::vec3 godEye(0.0, 50.0, 20.0), godViewDir(0.0, -30.0, -30.0), godUp(0.0, 1.0, 0.0);
-glm::vec3 godLocalX(-1, 0, 0), godLocalY(0, 1, 0), godLocalZ(0, 0, -1);
-glm::vec3 playerEye(0.0, 8.0, 10.0), playerCenter(0.0, 5.0, 0.0), playerUp(0.0, 1.0, 0.0);
+glm::vec3 playerEye(0.0, 4.0, 10.0), playerCenter(0.0, 5.0, 0.0), playerUp(0.0, 1.0, 0.0);
 glm::vec3 playerLocalZ(0, 0, -1);
 
 // ==============================================
 
-Model mergedGrass, slime;
+Model scene;
 int numSamples[3];
 const float* samplePositions[3];
 int totalInstanceCount;
@@ -159,15 +154,10 @@ void gameLoop(GLFWwindow* window)
     }
 }
 
-void initGrass()
+void initScene()
 {
-    std::vector<Model> grasses(3);
-
-    grasses[0] = Model("assets/grassB.obj", "assets/grassB_albedo.png");
-    grasses[1] = Model("assets/bush01_lod2.obj", "assets/bush01.png");
-    grasses[2] = Model("assets/bush05_lod2.obj", "assets/bush05.png");
-
-    mergedGrass = Model::merge(grasses);
+    // [TODO] load texture
+    scene = Model("assets/indoor/Grey_White_Room.obj", "assets/indoor/");
 }
 
 struct InstanceProperties
@@ -208,7 +198,7 @@ void initInstancedSettings()
 {
     GLuint offsetHandel = SceneManager::Instance()->m_offsetHandel;
 
-    glBindVertexArray(mergedGrass.shape.vao);
+    // glBindVertexArray(mergedGrass.shape.vao);
     glBindBuffer(GL_ARRAY_BUFFER, valid_ssbo);
     glEnableVertexAttribArray(offsetHandel);
     glVertexAttribPointer(offsetHandel, 4, GL_FLOAT, GL_FALSE, 0, nullptr);
@@ -226,37 +216,37 @@ struct DrawCommand
     unsigned int baseInstance;
 };
 
-void genDrawCommands()
-{
-    const int numCmd = 3;
-    DrawCommand cmdList[numCmd];
-
-    unsigned int offset = 0;
-    unsigned int baseInst = 0;
-
-    for (int i = 0; i < numCmd; i++)
-    {
-        cmdList[i].count = mergedGrass.drawCounts[i];
-        cmdList[i].instanceCount = numSamples[i];
-        cmdList[i].firstIndex = offset;
-        cmdList[i].baseVertex = mergedGrass.baseVertices[i];
-        cmdList[i].baseInstance = baseInst;
-
-        offset += mergedGrass.drawCounts[i];
-        baseInst += numSamples[i];
-    }
-
-    GLuint indirectBufHandle;
-
-    glGenBuffers(1, &indirectBufHandle);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, indirectBufHandle);
-    glBufferStorage(GL_SHADER_STORAGE_BUFFER, sizeof(DrawCommand) * numCmd, cmdList, GL_MAP_READ_BIT);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, indirectBufHandle);
-
-    glBindVertexArray(mergedGrass.shape.vao);
-    glBindBuffer(GL_DRAW_INDIRECT_BUFFER, indirectBufHandle);
-    glBindVertexArray(0);
-}
+// void genDrawCommands()
+// {
+//     const int numCmd = 3;
+//     DrawCommand cmdList[numCmd];
+//
+//     unsigned int offset = 0;
+//     unsigned int baseInst = 0;
+//
+//     for (int i = 0; i < numCmd; i++)
+//     {
+//         cmdList[i].count = mergedGrass.drawCounts[i];
+//         cmdList[i].instanceCount = numSamples[i];
+//         cmdList[i].firstIndex = offset;
+//         cmdList[i].baseVertex = mergedGrass.baseVertices[i];
+//         cmdList[i].baseInstance = baseInst;
+//
+//         offset += mergedGrass.drawCounts[i];
+//         baseInst += numSamples[i];
+//     }
+//
+//     GLuint indirectBufHandle;
+//
+//     glGenBuffers(1, &indirectBufHandle);
+//     glBindBuffer(GL_SHADER_STORAGE_BUFFER, indirectBufHandle);
+//     glBufferStorage(GL_SHADER_STORAGE_BUFFER, sizeof(DrawCommand) * numCmd, cmdList, GL_MAP_READ_BIT);
+//     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, indirectBufHandle);
+//
+//     glBindVertexArray(mergedGrass.shape.vao);
+//     glBindBuffer(GL_DRAW_INDIRECT_BUFFER, indirectBufHandle);
+//     glBindVertexArray(0);
+// }
 
 bool initializeGL()
 {
@@ -300,10 +290,6 @@ bool initializeGL()
 
     // =================================================================
     // initialize camera
-    // godViewMat = glm::lookAt(glm::vec3(0.0, 50.0, 20.0), glm::vec3(0.0, 20.0, -10.0), glm::vec3(0.0, 1.0, 0.0));
-    godLocalZ = glm::normalize(godViewDir);
-    godLocalY = glm::normalize(glm::cross(godLocalZ, godLocalX));
-    updateGodViewMat();
     updatePlayerViewMat();
 
     const glm::vec4 directionalLightDir = glm::vec4(0.4, 0.5, 0.8, 0.0);
@@ -316,10 +302,10 @@ bool initializeGL()
 
     // =================================================================	
     // load objs, init buffers
-    initGrass();
-    initSSBO();
-    initInstancedSettings();
-    genDrawCommands();
+    initScene();
+    // initSSBO();
+    // initInstancedSettings();
+    // genDrawCommands();
 
     return true;
 }
@@ -329,14 +315,9 @@ void resizeGL(GLFWwindow* window, int w, int h)
     resize(w, h);
 }
 
-void updateGodViewMat()
-{
-    godViewMat = glm::lookAt(godEye, godEye + godViewDir, godUp);
-}
-
 void updatePlayerViewMat()
 {
-    const float translateSpeed = 0.1f, rotateSpeed = 0.5f;
+    const float translateSpeed = 0.01f, rotateSpeed = 0.05f;
     const glm::vec3 translateAmount = translateSpeed * playerLocalZ;
 
     if (keyDown[KEY_W])
@@ -373,26 +354,63 @@ void recalculateLocalZ()
     playerLocalZ = glm::normalize(playerLocalZ);
 }
 
-void drawGrass()
+void drawScene()
 {
     auto sm = SceneManager::Instance();
 
     defaultRenderer->useProgram();
-    glUniform1i(sm->m_instancedDrawHandle, 1);
-    glBindVertexArray(mergedGrass.shape.vao);
-
-    glActiveTexture(sm->m_albedoTexUnit);
+    glActiveTexture(GL_TEXTURE0);
     glUniform1i(sm->m_fs_albedoTexHandle, 0);
-    glBindTexture(GL_TEXTURE_2D_ARRAY, mergedGrass.material.diffuse_tex);
 
-    glUniform1i(sm->m_fs_pixelProcessIdHandle, sm->m_fs_textureMapping);
     glm::mat4 id(1);
+    id = glm::scale(id, glm::vec3(5.0));
+    glm::quat q = glm::angleAxis(glm::radians(-90.0f), glm::vec3(0.0, 1.0, 0.0));
+    glm::mat4 rotMat = glm::toMat4(q);
+
+    id = rotMat * id;
+    id = glm::translate(id, glm::vec3(-2.5, 0.0, 1.5));
     glUniformMatrix4fv(sm->m_modelMatHandle, 1, false, glm::value_ptr(id));
 
-    glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, NULL, 3, 0);
+    for (const auto& shape : scene.shapes)
+    {
+        glBindVertexArray(shape.vao);
+        Material& material = scene.materials[shape.materialId];
 
-    glBindVertexArray(0);
-    glUniform1i(sm->m_instancedDrawHandle, 0);
+        if (material.hasTex)
+        {
+            glUniform1i(sm->m_fs_pixelProcessIdHandle, sm->m_fs_textureMapping);
+        }
+        else
+        {
+            glUniform1i(sm->m_fs_pixelProcessIdHandle, sm->m_fs_simpleShading);
+        }
+
+        glUniform3fv(sm->m_fs_kaHandle, 1, glm::value_ptr(material.ambient));
+        glUniform3fv(sm->m_fs_kdHandle, 1, glm::value_ptr(material.diffuse));
+        glUniform3fv(sm->m_fs_ksHandle, 1, glm::value_ptr(material.specular));
+
+        if (material.hasTex)
+        {
+            glBindTexture(GL_TEXTURE_2D, material.diffuseTex);
+        }
+        glDrawElements(GL_TRIANGLES, shape.drawCount, GL_UNSIGNED_INT, 0);
+        glBindVertexArray(0);
+    }
+
+    // glBindVertexArray(scene.shape.vao);
+    //
+    // glActiveTexture(sm->m_albedoTexUnit);
+    // glUniform1i(sm->m_fs_albedoTexHandle, 0);
+    // glBindTexture(GL_TEXTURE_2D_ARRAY, scene.material.diffuse_tex);
+    //
+    // glUniform1i(sm->m_fs_pixelProcessIdHandle, sm->m_fs_textureMapping);
+    // glm::mat4 id(1);
+    // glUniformMatrix4fv(sm->m_modelMatHandle, 1, false, glm::value_ptr(id));
+    //
+    // glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, NULL, 3, 0);
+    //
+    // glBindVertexArray(0);
+    // glUniform1i(sm->m_instancedDrawHandle, 0);
 }
 
 void paintGL()
@@ -401,7 +419,6 @@ void paintGL()
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
 
-    updateGodViewMat();
     updatePlayerViewMat();
     // ===============================
     // start new frame
@@ -410,7 +427,7 @@ void paintGL()
     defaultRenderer->setProjection(playerProjMat);
     defaultRenderer->setView(playerViewMat);
     defaultRenderer->renderPass();
-    drawGrass();
+    drawScene();
     // ===============================
 
     ImGui::Begin("FPS Info");
@@ -450,22 +467,22 @@ void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
 
 void cursorPosCallback(GLFWwindow* window, double x, double y)
 {
-    if (leftButtonPressed)
-    {
-        using namespace glm;
-        glm::vec2 changed = glm::vec2(x, y) - lastCursorPos;
-        vec2 change = 0.2f * (lastCursorPos - vec2(x, y));
-
-        int sign = (godViewDir.z > 0) ? -1 : 1;
-        mat4 R = mat4_cast(quat(vec3(radians(sign * change.y), radians(change.x), 0)));
-
-        godViewDir = (R * vec4(godViewDir, 1)).xyz;
-
-        godLocalZ = (R * vec4(godLocalZ, 1)).xyz;
-        godLocalX = normalize(cross(godUp, godLocalZ));
-        godLocalY = normalize(cross(godLocalZ, godLocalX));
-    }
-    lastCursorPos = glm::vec2(x, y);
+    // if (leftButtonPressed)
+    // {
+    //     using namespace glm;
+    //     glm::vec2 changed = glm::vec2(x, y) - lastCursorPos;
+    //     vec2 change = 0.2f * (lastCursorPos - vec2(x, y));
+    //
+    //     int sign = (godViewDir.z > 0) ? -1 : 1;
+    //     mat4 R = mat4_cast(quat(vec3(radians(sign * change.y), radians(change.x), 0)));
+    //
+    //     godViewDir = (R * vec4(godViewDir, 1)).xyz;
+    //
+    //     godLocalZ = (R * vec4(godLocalZ, 1)).xyz;
+    //     godLocalX = normalize(cross(godUp, godLocalZ));
+    //     godLocalY = normalize(cross(godLocalZ, godLocalX));
+    // }
+    // lastCursorPos = glm::vec2(x, y);
 }
 
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
@@ -490,7 +507,7 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 void mouseScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
 {
     // printf("%f, %f\n", xoffset, yoffset);
-    godEye += (float)yoffset * godLocalZ;
+    // godEye += (float)yoffset * godLocalZ;
 }
 
 void resize(const int w, const int h)
@@ -498,12 +515,9 @@ void resize(const int w, const int h)
     FRAME_WIDTH = w;
     FRAME_HEIGHT = h;
 
-    // half for god view, half for player view
-    const int HALF_W = w * 0.5;
     const double PLAYER_PROJ_FAR = 150.0;
 
-    godProjMat = glm::perspective(glm::radians(75.0), HALF_W * 1.0 / h, 0.1, 500.0);
-    playerProjMat = glm::perspective(glm::radians(45.0), HALF_W * 1.0 / h, 0.1, PLAYER_PROJ_FAR);
+    playerProjMat = glm::perspective(glm::radians(45.0), w * 1.0 / h, 0.1, PLAYER_PROJ_FAR);
 
     defaultRenderer->resize(w, h);
 }

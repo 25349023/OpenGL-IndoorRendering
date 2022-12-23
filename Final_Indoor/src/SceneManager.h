@@ -45,9 +45,7 @@ public:
     GLuint m_modelMatHandle;
     GLuint m_instancedDrawHandle;
 
-
     GLuint m_materialHandle;
-
 
     GLuint m_gaussianWeights;
 
@@ -56,19 +54,16 @@ public:
     GLuint m_fs_pixelProcessIdHandle;
     GLuint m_fs_albedoTexHandle;
 
+    GLuint m_fs_kaHandle;
+    GLuint m_fs_kdHandle;
+    GLuint m_fs_ksHandle;
+
     GLenum m_albedoTexUnit;
     GLenum m_normalTexUnit;
 
     GLenum m_albedoTexArrayUnit;
 
-
-    int m_fs_textureMapping;
     int m_fs_commonProcess;
-    int m_fs_gaussianX;
-    int m_fs_gaussianY;
-    int m_fs_proceduralPlane;
-    int m_fs_pureColor;
-    int m_fs_textureMappingWithTextureArray;
-    int m_fs_finalPass;
-    int m_fs_slime;
+    int m_fs_textureMapping;
+    int m_fs_simpleShading;
 };
