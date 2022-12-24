@@ -75,9 +75,9 @@
     <Content Include="assets\indoor\trice.mtl" />
     <Content Include="assets\indoor\trice.obj" />
     <Content Include="assets\indoor\tricnorm.jpg" />
-    <Content Include="src\shader\oglComputeShader.glsl" />
+    <Content Include="src\shader\fbufFragmentShader.glsl" />
+    <Content Include="src\shader\fbufVertexShader.glsl" />
     <Content Include="src\shader\oglFragmentShader.glsl" />
-    <Content Include="src\shader\oglResetParamShader.glsl" />
     <Content Include="src\shader\oglVertexShader.glsl" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

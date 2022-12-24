@@ -3,16 +3,9 @@
 
 RenderSetting::RenderSetting() {}
 
-
 RenderSetting::~RenderSetting() {}
 
-void RenderSetting::startNewFrame()
-{
-    this->m_shaderProgram->useProgram();
-    this->clear();
-}
-
-void RenderSetting::beforeRender()
+void RenderSetting::prepareUniform()
 {
     SceneManager* manager = SceneManager::Instance();
 
@@ -63,15 +56,6 @@ void RenderSetting::setView(const glm::mat4& view)
 void RenderSetting::setViewport(const int x, const int y, const int w, const int h)
 {
     glViewport(x, y, w, h);
-}
-
-void RenderSetting::clear(const glm::vec4& clearColor, const float depth)
-{
-    static const float COLOR[] = {0.1, 0.1, 0.1, 1.0};
-    static const float DEPTH[] = {1.0};
-
-    glClearBufferfv(GL_COLOR, 0, COLOR);
-    glClearBufferfv(GL_DEPTH, 0, DEPTH);
 }
 
 bool RenderSetting::setUpShader()

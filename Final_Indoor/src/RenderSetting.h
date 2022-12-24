@@ -25,13 +25,10 @@ public:
     void setView(const glm::mat4& view);
     void setViewport(const int x, const int y, const int w, const int h);
 
-    // pipeline
 public:
-    void startNewFrame();
-    void beforeRender();
+    void prepareUniform();
     void useProgram();
 
 private:
-    void clear(const glm::vec4& clearColor = glm::vec4(0.0, 0.0, 0.0, 1.0), const float depth = 1.0);
     bool setUpShader();
 };

@@ -10,6 +10,7 @@
 #include "assimp/cimport.h"
 #include "assimp/scene.h"
 #include "assimp/postprocess.h"
+#include "src/DeferredRenderer.h"
 
 #include "src/Shape.h"
 #include "src/Material.h"
@@ -47,8 +48,9 @@ MyImGuiPanel* m_imguiPanel = nullptr;
 
 
 // ==============================================
-RenderSetting* defaultRenderSetting = nullptr;
-ShaderProgram* framebufShaderProgram;
+RenderSetting* renderSetting = nullptr;
+DeferredRenderer* deferredRenderer = nullptr;
+// ShaderProgram* framebufShaderProgram = nullptr;
 
 glm::mat4 playerProjMat;
 glm::mat4 playerViewMat;
@@ -173,23 +175,34 @@ bool initializeGL()
         return false;
     }
 
+    ShaderProgram* screenShaderProgram = new ShaderProgram(
+        "src\\shader\\fbufVertexShader.glsl", "src\\shader\\fbufFragmentShader.glsl");
+    if (screenShaderProgram->status() != ShaderProgramStatus::READY)
+    {
+        return false;
+    }
+
     // =================================================================
     m_imguiPanel = new MyImGuiPanel();
 
     // =================================================================
     // init renderer
-    defaultRenderSetting = new RenderSetting();
-    if (!defaultRenderSetting->initialize(FRAME_WIDTH, FRAME_HEIGHT, shaderProgram))
+    renderSetting = new RenderSetting();
+    if (!renderSetting->initialize(FRAME_WIDTH, FRAME_HEIGHT, shaderProgram))
     {
         return false;
     }
-    defaultRenderSetting->setViewport(0, 0, FRAME_WIDTH, FRAME_HEIGHT);
+    renderSetting->setViewport(0, 0, FRAME_WIDTH, FRAME_HEIGHT);
+
+    deferredRenderer = new DeferredRenderer(glm::ivec2(FRAME_WIDTH, FRAME_HEIGHT));
+    deferredRenderer->fbufShaderProgram = shaderProgram;
+    deferredRenderer->screenShaderProgram = screenShaderProgram;
 
     // =================================================================
     // initialize camera
     updatePlayerViewMat();
     resize(FRAME_WIDTH, FRAME_HEIGHT);
-    
+
     // =================================================================	
     // load objs, init buffers
     initScene();
@@ -265,13 +278,16 @@ void paintGL()
     updatePlayerViewMat();
     // ===============================
     // start new frame
-    defaultRenderSetting->startNewFrame();
+    deferredRenderer->beforeFirstStage();
+    
+    renderSetting->setProjection(playerProjMat);
+    renderSetting->setView(playerViewMat);
+    renderSetting->prepareUniform();
 
-    defaultRenderSetting->setProjection(playerProjMat);
-    defaultRenderSetting->setView(playerViewMat);
-    defaultRenderSetting->beforeRender();
     scene.render();
     trice.render();
+
+    deferredRenderer->secondStage();
 
     // ===============================
 
@@ -350,7 +366,8 @@ void resize(const int w, const int h)
 
     playerProjMat = glm::perspective(glm::radians(45.0), w * 1.0 / h, 0.1, PLAYER_PROJ_FAR);
 
-    defaultRenderSetting->resize(w, h);
+    renderSetting->resize(w, h);
+    deferredRenderer->updateWindowSize(glm::ivec2(w, h));
 }
 
 glm::vec3 rotateCenterAccordingToEye(const glm::vec3& center, const glm::vec3& eye,
