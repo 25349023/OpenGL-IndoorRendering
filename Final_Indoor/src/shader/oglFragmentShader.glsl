@@ -7,6 +7,8 @@ in vec3 f_worldNormal;
 in vec3 f_uv;
 
 layout (location = 0) out vec4 fragColor;
+layout (location = 1) out vec4 worldSpaceVertex;
+layout (location = 2) out vec4 worldSpaceNormal;
 
 uniform int pixelProcessId;
 uniform sampler2D albedoTex;
@@ -64,4 +66,6 @@ void main() {
     else if (pixelProcessId == 2) {
         simple_shading();
     }
+    worldSpaceVertex = vec4(normalize(f_worldVertex) * 0.5 + 0.5, 1);
+    worldSpaceNormal = vec4(normalize(f_worldNormal) * 0.5 + 0.5, 1);
 }

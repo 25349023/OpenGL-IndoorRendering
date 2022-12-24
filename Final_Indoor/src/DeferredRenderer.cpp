@@ -1,8 +1,9 @@
 #include "DeferredRenderer.h"
 
-DeferredRenderer::DeferredRenderer(glm::vec2 ws)
+DeferredRenderer::DeferredRenderer(int na, glm::vec2 ws)
 {
     winSize = ws;
+    numAttachment = na;
     setupFrameBuffer();
 }
 
@@ -38,8 +39,11 @@ void DeferredRenderer::setupFrameBuffer()
     // Create fboDataTexture
     attachedTexs.clear();
     drawBuffers.clear();
-    attachNewFBTexture();
-    activateFBTexture(0);
+    for (int i = 0; i < numAttachment; ++i)
+    {
+        attachNewFBTexture();
+    }
+    activateFBTexture(WORLD_NORMAL);
 
     // Create Depth RBO
     glGenRenderbuffers(1, &depthRbo);
@@ -111,11 +115,14 @@ void DeferredRenderer::clear()
     static const float COLOR[] = { 0.1, 0.1, 0.1, 1.0 };
     static const float DEPTH[] = { 1.0 };
 
-    glClearBufferfv(GL_COLOR, 0, COLOR);
+    for (int i = 0; i < attachedTexs.size(); ++i)
+    {
+        glClearBufferfv(GL_COLOR, i, COLOR);
+    }
     glClearBufferfv(GL_DEPTH, 0, DEPTH);
 }
 
-void DeferredRenderer::activateFBTexture(int target)
+void DeferredRenderer::activateFBTexture(Attachments target)
 {
     activeTex = attachedTexs[target];
 }

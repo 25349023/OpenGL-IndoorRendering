@@ -194,7 +194,7 @@ bool initializeGL()
     }
     renderSetting->setViewport(0, 0, FRAME_WIDTH, FRAME_HEIGHT);
 
-    deferredRenderer = new DeferredRenderer(glm::ivec2(FRAME_WIDTH, FRAME_HEIGHT));
+    deferredRenderer = new DeferredRenderer(3, glm::ivec2(FRAME_WIDTH, FRAME_HEIGHT));
     deferredRenderer->fbufShaderProgram = shaderProgram;
     deferredRenderer->screenShaderProgram = screenShaderProgram;
 

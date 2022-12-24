@@ -6,10 +6,15 @@
 #include "Shader.h"
 #include "GLM/glm.hpp"
 
+enum Attachments
+{
+    DIFFUSE_COLOR, WORLD_VERTEX, WORLD_NORMAL
+};
+
 class DeferredRenderer
 {
 public:
-    DeferredRenderer(glm::vec2 ws);
+    DeferredRenderer(int na, glm::vec2 ws);
     
     void updateWindowSize(glm::vec2 ws);
     int attachNewFBTexture();
@@ -27,6 +32,8 @@ private:
     GLuint windowVbo{};
     GLuint fbo{};
     GLuint depthRbo{};
+
+    int numAttachment;
     
     std::vector<GLuint> attachedTexs{};
     std::vector<GLenum> drawBuffers{};
@@ -37,5 +44,5 @@ private:
     void setupFrameBuffer();
 
     void genFBTexture(GLuint& tex, int attachment);
-    void activateFBTexture(int target);
+    void activateFBTexture(Attachments target);
 };
