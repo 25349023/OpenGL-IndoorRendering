@@ -114,6 +114,33 @@ ShaderProgram::ShaderProgram() : m_programId(0)
     this->m_fsReady = false;
 }
 
+ShaderProgram::ShaderProgram(const char* vsPath, const char* fsPath)
+{
+    Shader* vsShader = new Shader(GL_VERTEX_SHADER);
+    vsShader->createShaderFromFile(vsPath);
+    std::cout << vsShader->shaderInfoLog() << "\n";
+
+    Shader* fsShader = new Shader(GL_FRAGMENT_SHADER);
+    fsShader->createShaderFromFile(fsPath);
+    std::cout << fsShader->shaderInfoLog() << "\n";
+
+    // shader program
+    init();
+    attachShader(vsShader);
+    attachShader(fsShader);
+    checkStatus();
+    if (status() == ShaderProgramStatus::READY)
+    {
+        linkProgram();
+    }
+
+    vsShader->releaseShader();
+    fsShader->releaseShader();
+
+    delete vsShader;
+    delete fsShader;
+}
+
 ShaderProgram::~ShaderProgram() {}
 
 bool ShaderProgram::init()

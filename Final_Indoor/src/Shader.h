@@ -56,6 +56,8 @@ class ShaderProgram
 {
 public:
     ShaderProgram();
+    ShaderProgram(const char* vsPath,const char* fsPath);
+    
     virtual ~ShaderProgram();
 
 public:
@@ -70,10 +72,10 @@ public:
     ShaderProgramStatus status() const;
 
 private:
-    GLuint m_programId;
+    GLuint m_programId{};
     bool m_vsReady = false;
     bool m_fsReady = false;
     bool m_csReady = false;
 
-    ShaderProgramStatus m_shaderProgramStatus;
+    ShaderProgramStatus m_shaderProgramStatus{};
 };

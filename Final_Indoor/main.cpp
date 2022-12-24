@@ -48,7 +48,7 @@ MyImGuiPanel* m_imguiPanel = nullptr;
 
 // ==============================================
 RenderSetting* defaultRenderSetting = nullptr;
-ShaderProgram* defaultShaderProgram = new ShaderProgram();
+ShaderProgram* framebufShaderProgram;
 
 glm::mat4 playerProjMat;
 glm::mat4 playerViewMat;
@@ -166,33 +166,12 @@ void initScene()
 bool initializeGL()
 {
     // initialize shader program
-    // vertex shader
-    Shader* vsShader = new Shader(GL_VERTEX_SHADER);
-    vsShader->createShaderFromFile("src\\shader\\oglVertexShader.glsl");
-    std::cout << vsShader->shaderInfoLog() << "\n";
-
-    // fragment shader
-    Shader* fsShader = new Shader(GL_FRAGMENT_SHADER);
-    fsShader->createShaderFromFile("src\\shader\\oglFragmentShader.glsl");
-    std::cout << fsShader->shaderInfoLog() << "\n";
-
-    // shader program
-    ShaderProgram* shaderProgram = new ShaderProgram();
-    shaderProgram->init();
-    shaderProgram->attachShader(vsShader);
-    shaderProgram->attachShader(fsShader);
-    shaderProgram->checkStatus();
+    ShaderProgram* shaderProgram = new ShaderProgram(
+        "src\\shader\\oglVertexShader.glsl", "src\\shader\\oglFragmentShader.glsl");
     if (shaderProgram->status() != ShaderProgramStatus::READY)
     {
         return false;
     }
-    shaderProgram->linkProgram();
-
-    vsShader->releaseShader();
-    fsShader->releaseShader();
-
-    delete vsShader;
-    delete fsShader;
 
     // =================================================================
     m_imguiPanel = new MyImGuiPanel();
