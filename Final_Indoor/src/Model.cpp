@@ -3,13 +3,16 @@
 #include <iostream>
 #include <assimp/cimport.h>
 #include <assimp/postprocess.h>
+#include <glm/gtx/quaternion.hpp>
+
+#include "SceneManager.h"
 
 
 Model::Model(const char* mesh_path, const char* asset_root)
 {
     loadMeshes(mesh_path);
     loadMaterials(asset_root);
-    
+
     aiReleaseImport(model);
     model = nullptr;
 }
@@ -66,6 +69,55 @@ void Model::loadMaterials(const char* asset_root)
     }
 }
 
+void Model::setTransform(glm::vec3 t, glm::vec3 r, glm::vec3 s)
+{
+    translation = t;
+    rotation = r;
+    scaling = s;
+}
+
+void Model::render()
+{
+    auto sm = SceneManager::Instance();
+
+    glActiveTexture(GL_TEXTURE0);
+    glUniform1i(sm->m_fs_albedoTexHandle, 0);
+
+    glm::mat4 T(1.0), R(1.0), S(1.0);
+    T = glm::translate(T, translation);
+    R = glm::mat4_cast(glm::quat(rotation));
+    S = glm::scale(S, scaling);
+
+    glm::mat4 modelMat = T * R * S;
+    glUniformMatrix4fv(sm->m_modelMatHandle, 1, false, glm::value_ptr(modelMat));
+
+    for (const auto& shape : shapes)
+    {
+        glBindVertexArray(shape.vao);
+        Material& material = materials[shape.materialId];
+
+        if (material.hasTex)
+        {
+            glUniform1i(sm->m_fs_pixelProcessIdHandle, sm->m_fs_textureMapping);
+        }
+        else
+        {
+            glUniform1i(sm->m_fs_pixelProcessIdHandle, sm->m_fs_simpleShading);
+        }
+
+        glUniform3fv(sm->m_fs_kaHandle, 1, glm::value_ptr(material.ambient));
+        glUniform3fv(sm->m_fs_kdHandle, 1, glm::value_ptr(material.diffuse));
+        glUniform3fv(sm->m_fs_ksHandle, 1, glm::value_ptr(material.specular));
+
+        if (material.hasTex)
+        {
+            glBindTexture(GL_TEXTURE_2D, material.diffuseTex);
+        }
+        glDrawElements(GL_TRIANGLES, shape.drawCount, GL_UNSIGNED_INT, 0);
+        glBindVertexArray(0);
+    }
+}
+
 Model Model::merge(std::vector<Model>& models)
 {
     Model merged;
@@ -74,7 +126,7 @@ Model Model::merge(std::vector<Model>& models)
         merged.shapes.insert(merged.shapes.end(), model.shapes.begin(), model.shapes.end());
         merged.materials.insert(merged.materials.end(), model.materials.begin(), model.materials.end());
     }
-    
+
     return merged;
 
     // merge shapes

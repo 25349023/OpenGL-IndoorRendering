@@ -60,7 +60,7 @@ glm::vec3 playerLocalZ(0, 0, -1), playerLocalY(0, 1, 0);
 
 // ==============================================
 
-Model scene;
+Model scene, trice;
 
 GLuint vao, raw_ssbo, valid_ssbo, drawCmd_ssbo;
 
@@ -159,6 +159,10 @@ void gameLoop(GLFWwindow* window)
 void initScene()
 {
     scene = Model("assets/indoor/Grey_White_Room.obj", "assets/indoor/");
+    scene.setTransform(glm::vec3(-20, 0.0, -35), glm::vec3(0, glm::radians(-80.0f), 0), glm::vec3(10.0));
+
+    trice = Model("assets/indoor/trice.obj", "assets/indoor/");
+    trice.setTransform(glm::vec3(2.0, 6.3, -17), glm::vec3(0, glm::radians(-80.0f), 0), glm::vec3(0.01));
 }
 
 bool initializeGL()
@@ -279,50 +283,6 @@ void recalculatePlayerLocals()
     playerLocalY = glm::normalize(glm::cross(side, playerLocalZ));
 }
 
-void drawScene()
-{
-    auto sm = SceneManager::Instance();
-
-    defaultRenderer->useProgram();
-    glActiveTexture(GL_TEXTURE0);
-    glUniform1i(sm->m_fs_albedoTexHandle, 0);
-
-    glm::mat4 id(1);
-    id = glm::scale(id, glm::vec3(10.0));
-    glm::quat q = glm::angleAxis(glm::radians(-80.0f), glm::vec3(0.0, 1.0, 0.0));
-    glm::mat4 rotMat = glm::toMat4(q);
-
-    id = rotMat * id;
-    id = glm::translate(id, glm::vec3(-3.5, 0.0, 1.5));
-    glUniformMatrix4fv(sm->m_modelMatHandle, 1, false, glm::value_ptr(id));
-
-    for (const auto& shape : scene.shapes)
-    {
-        glBindVertexArray(shape.vao);
-        Material& material = scene.materials[shape.materialId];
-
-        if (material.hasTex)
-        {
-            glUniform1i(sm->m_fs_pixelProcessIdHandle, sm->m_fs_textureMapping);
-        }
-        else
-        {
-            glUniform1i(sm->m_fs_pixelProcessIdHandle, sm->m_fs_simpleShading);
-        }
-
-        glUniform3fv(sm->m_fs_kaHandle, 1, glm::value_ptr(material.ambient));
-        glUniform3fv(sm->m_fs_kdHandle, 1, glm::value_ptr(material.diffuse));
-        glUniform3fv(sm->m_fs_ksHandle, 1, glm::value_ptr(material.specular));
-
-        if (material.hasTex)
-        {
-            glBindTexture(GL_TEXTURE_2D, material.diffuseTex);
-        }
-        glDrawElements(GL_TRIANGLES, shape.drawCount, GL_UNSIGNED_INT, 0);
-        glBindVertexArray(0);
-    }
-}
-
 void paintGL()
 {
     ImGui_ImplOpenGL3_NewFrame();
@@ -337,7 +297,9 @@ void paintGL()
     defaultRenderer->setProjection(playerProjMat);
     defaultRenderer->setView(playerViewMat);
     defaultRenderer->renderPass();
-    drawScene();
+    scene.render();
+    trice.render();
+
     // ===============================
 
     ImGui::Begin("Toolbox");
