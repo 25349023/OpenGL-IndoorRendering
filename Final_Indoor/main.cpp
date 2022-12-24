@@ -1,9 +1,7 @@
 #define GLM_FORCE_SWIZZLE
 
-#include <array>
-
 #include "src\Shader.h"
-#include "src\SceneRenderer.h"
+#include "src\RenderSetting.h"
 #include <GLFW\glfw3.h>
 #include "src\MyImGuiPanel.h"
 
@@ -49,7 +47,7 @@ MyImGuiPanel* m_imguiPanel = nullptr;
 
 
 // ==============================================
-SceneRenderer* defaultRenderer = nullptr;
+RenderSetting* defaultRenderSetting = nullptr;
 ShaderProgram* defaultShaderProgram = new ShaderProgram();
 
 glm::mat4 playerProjMat;
@@ -112,7 +110,7 @@ int main()
     ImGui::StyleColorsDark();
 
     ImFontConfig config;
-    config.SizePixels = 18;
+    config.SizePixels = 16;
     io.Fonts->AddFontDefault(&config);
 
     ImGui_ImplGlfw_InitForOpenGL(window, true);
@@ -201,22 +199,18 @@ bool initializeGL()
 
     // =================================================================
     // init renderer
-    defaultRenderer = new SceneRenderer();
-    if (!defaultRenderer->initialize(FRAME_WIDTH, FRAME_HEIGHT, shaderProgram))
+    defaultRenderSetting = new RenderSetting();
+    if (!defaultRenderSetting->initialize(FRAME_WIDTH, FRAME_HEIGHT, shaderProgram))
     {
         return false;
     }
-    defaultRenderer->setViewport(0, 0, FRAME_WIDTH, FRAME_HEIGHT);
+    defaultRenderSetting->setViewport(0, 0, FRAME_WIDTH, FRAME_HEIGHT);
 
     // =================================================================
     // initialize camera
     updatePlayerViewMat();
-
-    const glm::vec4 directionalLightDir = glm::vec4(0.4, 0.5, 0.8, 0.0);
-
-    defaultRenderer->setDirectionalLightDir(directionalLightDir);
-
     resize(FRAME_WIDTH, FRAME_HEIGHT);
+    
     // =================================================================	
     // load objs, init buffers
     initScene();
@@ -292,11 +286,11 @@ void paintGL()
     updatePlayerViewMat();
     // ===============================
     // start new frame
-    defaultRenderer->startNewFrame();
+    defaultRenderSetting->startNewFrame();
 
-    defaultRenderer->setProjection(playerProjMat);
-    defaultRenderer->setView(playerViewMat);
-    defaultRenderer->renderPass();
+    defaultRenderSetting->setProjection(playerProjMat);
+    defaultRenderSetting->setView(playerViewMat);
+    defaultRenderSetting->beforeRender();
     scene.render();
     trice.render();
 
@@ -377,7 +371,7 @@ void resize(const int w, const int h)
 
     playerProjMat = glm::perspective(glm::radians(45.0), w * 1.0 / h, 0.1, PLAYER_PROJ_FAR);
 
-    defaultRenderer->resize(w, h);
+    defaultRenderSetting->resize(w, h);
 }
 
 glm::vec3 rotateCenterAccordingToEye(const glm::vec3& center, const glm::vec3& eye,

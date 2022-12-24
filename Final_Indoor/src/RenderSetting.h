@@ -4,17 +4,16 @@
 #include "SceneManager.h"
 
 
-class SceneRenderer
+class RenderSetting
 {
 public:
-    SceneRenderer();
-    virtual ~SceneRenderer();
+    RenderSetting();
+    virtual ~RenderSetting();
 
 private:
     ShaderProgram* m_shaderProgram = nullptr;
     glm::mat4 m_projMat;
     glm::mat4 m_viewMat;
-    glm::vec4 m_directionalLightDir;
     int m_frameWidth;
     int m_frameHeight;
 
@@ -24,13 +23,12 @@ public:
 
     void setProjection(const glm::mat4& proj);
     void setView(const glm::mat4& view);
-    void setDirectionalLightDir(const glm::vec4& dir);
     void setViewport(const int x, const int y, const int w, const int h);
 
     // pipeline
 public:
     void startNewFrame();
-    void renderPass();
+    void beforeRender();
     void useProgram();
 
 private:

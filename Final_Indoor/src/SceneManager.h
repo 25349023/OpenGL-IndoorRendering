@@ -32,13 +32,6 @@ public:
     GLuint m_normalHandle;
     GLuint m_uvHandle;
     GLuint m_offsetHandel;
-    //GLint m_boneIndexHandle;
-    //GLint m_weightHandle;
-    //GLint m_tangentHandle;
-    GLuint m_instanceMatCol0Handle;
-    GLuint m_instanceMatCol1Handle;
-    GLuint m_instanceMatCol2Handle;
-    GLuint m_instanceMatCol3Handle;
 
     GLuint m_projMatHandle;
     GLuint m_viewMatHandle;
@@ -46,10 +39,6 @@ public:
     GLuint m_instancedDrawHandle;
 
     GLuint m_materialHandle;
-
-    GLuint m_gaussianWeights;
-
-    GLuint m_lightPositionInViewHandle;
 
     GLuint m_fs_pixelProcessIdHandle;
     GLuint m_fs_albedoTexHandle;
@@ -60,8 +49,6 @@ public:
 
     GLenum m_albedoTexUnit;
     GLenum m_normalTexUnit;
-
-    GLenum m_albedoTexArrayUnit;
 
     int m_fs_commonProcess;
     int m_fs_textureMapping;
