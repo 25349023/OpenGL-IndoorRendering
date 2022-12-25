@@ -1,10 +1,5 @@
 #pragma once
 
-#include <glm\mat4x4.hpp>
-#include <glm\gtx\transform.hpp>
-#include <glm\gtc\type_ptr.hpp>
-
-
 #include <glad\glad.h>
 
 // Singleton
@@ -12,7 +7,8 @@
 class SceneManager
 {
 private:
-    SceneManager() {}
+    SceneManager(): m_vertexHandle(0), m_normalHandle(1), m_uvHandle(2),
+    m_fs_commonProcess(0), m_fs_textureMapping(1), m_fs_simpleShading(2) {}
 
 
 public:
@@ -31,24 +27,6 @@ public:
     GLuint m_vertexHandle;
     GLuint m_normalHandle;
     GLuint m_uvHandle;
-    //
-    // GLuint m_projMatHandle;
-    // GLuint m_viewMatHandle;
-    // GLuint m_modelMatHandle;
-    // GLuint m_modelRotateMatHandle;
-    //
-    // GLuint m_materialHandle;
-    //
-    // GLuint m_fs_pixelProcessIdHandle;
-    // GLuint m_fs_albedoTexHandle;
-    //
-    // GLuint m_fs_kaHandle;
-    // GLuint m_fs_kdHandle;
-    // GLuint m_fs_ksHandle;
-    // GLuint m_fs_nsHandle;
-
-    GLenum m_albedoTexUnit;
-    GLenum m_normalTexUnit;
 
     int m_fs_commonProcess;
     int m_fs_textureMapping;

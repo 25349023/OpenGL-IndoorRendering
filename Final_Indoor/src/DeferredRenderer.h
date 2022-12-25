@@ -3,7 +3,7 @@
 #include <vector>
 #include <glad/glad.h>
 
-#include "RenderSetting.h"
+#include "DeferredRenderer.h"
 #include "Shader.h"
 #include "GLM/glm.hpp"
 
@@ -19,17 +19,15 @@ enum GBuffer
     GBUFFER_COUNT
 };
 
-extern RenderSetting* renderSetting;
-
 class DeferredRenderer
 {
 public:
-    DeferredRenderer(int na, glm::vec2 ws);
+    DeferredRenderer(int na, glm::ivec2 ws);
 
-    void updateWindowSize(glm::vec2 ws);
+    void updateWindowSize(glm::ivec2 ws);
     int attachNewFBTexture();
 
-    void beforeFirstStage();
+    void prepareFirstStage();
     void secondStage();
 
     void clear();
@@ -41,8 +39,11 @@ public:
 
     ShaderProgram* fbufSP{};
     ShaderProgram* screenSP{};
-private:
 
+    glm::mat4 projMat{ 1.0 };
+    glm::mat4 viewMat{ 1.0 };
+
+private:
     GLuint frameVao{};
     GLuint windowVbo{};
     GLuint fbo{};

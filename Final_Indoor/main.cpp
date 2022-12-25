@@ -1,7 +1,6 @@
 #define GLM_FORCE_SWIZZLE
 
 #include "src\Shader.h"
-#include "src\RenderSetting.h"
 #include <GLFW\glfw3.h>
 #include "src\MyImGuiPanel.h"
 
@@ -29,7 +28,7 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 
 void gameLoop(GLFWwindow* window);
 
-void updatePlayerViewMat();
+void updateViewMat();
 void recalculatePlayerLocals();
 bool initializeGL();
 void resizeGL(GLFWwindow* window, int w, int h);
@@ -48,12 +47,7 @@ MyImGuiPanel* m_imguiPanel = nullptr;
 
 
 // ==============================================
-RenderSetting* renderSetting = nullptr;
 DeferredRenderer* deferredRenderer = nullptr;
-// ShaderProgram* framebufShaderProgram = nullptr;
-
-glm::mat4 playerProjMat;
-glm::mat4 playerViewMat;
 
 glm::vec3 playerUp(0.0, 1.0, 0.0);
 glm::vec3 playerLocalZ(0, 0, -1), playerLocalY(0, 1, 0);
@@ -187,12 +181,6 @@ bool initializeGL()
 
     // =================================================================
     // init renderer
-    renderSetting = new RenderSetting();
-    if (!renderSetting->initialize(FRAME_WIDTH, FRAME_HEIGHT, shaderProgram))
-    {
-        return false;
-    }
-    renderSetting->setViewport(0, 0, FRAME_WIDTH, FRAME_HEIGHT);
 
     deferredRenderer = new DeferredRenderer(GBUFFER_COUNT, glm::ivec2(FRAME_WIDTH, FRAME_HEIGHT));
     deferredRenderer->fbufSP = shaderProgram;
@@ -200,7 +188,7 @@ bool initializeGL()
 
     // =================================================================
     // initialize camera
-    updatePlayerViewMat();
+    updateViewMat();
     resize(FRAME_WIDTH, FRAME_HEIGHT);
 
     // =================================================================	
@@ -215,7 +203,7 @@ void resizeGL(GLFWwindow* window, int w, int h)
     resize(w, h);
 }
 
-void updatePlayerViewMat()
+void updateViewMat()
 {
     const float translateSpeed = 0.01f, rotateSpeed = 0.5f;
     const glm::vec3 translateZAmount = translateSpeed * playerLocalZ;
@@ -246,17 +234,17 @@ void updatePlayerViewMat()
     if (keyDown[KEY_A])
     {
         deferredRenderer->camCenter = rotateCenterAccordingToEye(
-            deferredRenderer->camCenter, deferredRenderer->camEye, playerViewMat, glm::radians(rotateSpeed));
+            deferredRenderer->camCenter, deferredRenderer->camEye, deferredRenderer->viewMat, glm::radians(rotateSpeed));
         recalculatePlayerLocals();
     }
     else if (keyDown[KEY_D])
     {
         deferredRenderer->camCenter = rotateCenterAccordingToEye(
-            deferredRenderer->camCenter, deferredRenderer->camEye, playerViewMat, glm::radians(-rotateSpeed));
+            deferredRenderer->camCenter, deferredRenderer->camEye, deferredRenderer->viewMat, glm::radians(-rotateSpeed));
         recalculatePlayerLocals();
     }
 
-    playerViewMat = glm::lookAt(deferredRenderer->camEye, deferredRenderer->camCenter, playerUp);
+    deferredRenderer->viewMat = glm::lookAt(deferredRenderer->camEye, deferredRenderer->camCenter, playerUp);
 }
 
 void recalculatePlayerLocals()
@@ -275,14 +263,10 @@ void paintGL()
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
 
-    updatePlayerViewMat();
+    updateViewMat();
     // ===============================
     // start new frame
-    deferredRenderer->beforeFirstStage();
-
-    renderSetting->setProjection(playerProjMat);
-    renderSetting->setView(playerViewMat);
-    renderSetting->prepareUniform();
+    deferredRenderer->prepareFirstStage();
 
     scene.render(deferredRenderer->fbufSP);
     trice.render(deferredRenderer->fbufSP);
@@ -364,9 +348,8 @@ void resize(const int w, const int h)
 
     const double PLAYER_PROJ_FAR = 150.0;
 
-    playerProjMat = glm::perspective(glm::radians(45.0), w * 1.0 / h, 0.1, PLAYER_PROJ_FAR);
+    deferredRenderer->projMat = glm::perspective(glm::radians(45.0), w * 1.0 / h, 0.1, PLAYER_PROJ_FAR);
 
-    renderSetting->resize(w, h);
     deferredRenderer->updateWindowSize(glm::ivec2(w, h));
 }
 

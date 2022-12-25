@@ -2,11 +2,11 @@
 
 #include <GLM/gtc/type_ptr.hpp>
 
-DeferredRenderer::DeferredRenderer(int na, glm::vec2 ws)
+DeferredRenderer::DeferredRenderer(int na, glm::ivec2 ws)
 {
-    winSize = ws;
     numAttachment = na;
-    setupFrameBuffer();
+    updateWindowSize(ws);
+    glEnable(GL_DEPTH_TEST);
 }
 
 void DeferredRenderer::setupFrameBuffer()
@@ -72,9 +72,10 @@ void DeferredRenderer::genFBTexture(GLuint& tex, int attachment)
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + attachment, GL_TEXTURE_2D, tex, 0);
 }
 
-void DeferredRenderer::updateWindowSize(glm::vec2 ws)
+void DeferredRenderer::updateWindowSize(glm::ivec2 ws)
 {
     winSize = ws;
+    glViewport(0, 0, ws.x, ws.y);
     setupFrameBuffer();
 }
 
@@ -88,12 +89,14 @@ int DeferredRenderer::attachNewFBTexture()
     return idx;
 }
 
-void DeferredRenderer::beforeFirstStage()
+void DeferredRenderer::prepareFirstStage()
 {
     glBindFramebuffer(GL_FRAMEBUFFER, fbo);
     glDrawBuffers(attachedTexs.size(), drawBuffers.data());
     clear();
     fbufSP->useProgram();
+    glUniformMatrix4fv((*fbufSP)["projMat"], 1, false, glm::value_ptr(this->projMat));
+    glUniformMatrix4fv((*fbufSP)["viewMat"], 1, false, glm::value_ptr(this->viewMat));
 }
 
 void DeferredRenderer::secondStage()
@@ -106,7 +109,7 @@ void DeferredRenderer::secondStage()
     glUniform1i((*screenSP)["activeTex"], activeTex);
     glUniform3fv((*screenSP)["cameraEye"], 1, glm::value_ptr(camEye));
     glUniform3fv((*screenSP)["directionalLight"], 1, glm::value_ptr(dirLight));
-    
+
     for (int i = 0; i < GBUFFER_COUNT; ++i)
     {
         glUniform1i(i, i);

@@ -8,7 +8,6 @@
 #include <GLM/vec3.hpp>
 
 #include "DeferredRenderer.h"
-#include "RenderSetting.h"
 
 extern DeferredRenderer *deferredRenderer;
 
