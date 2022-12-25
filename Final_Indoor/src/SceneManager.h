@@ -31,22 +31,21 @@ public:
     GLuint m_vertexHandle;
     GLuint m_normalHandle;
     GLuint m_uvHandle;
-    GLuint m_offsetHandel;
-
-    GLuint m_projMatHandle;
-    GLuint m_viewMatHandle;
-    GLuint m_modelMatHandle;
-    GLuint m_modelRotateMatHandle;
-
-    GLuint m_materialHandle;
-
-    GLuint m_fs_pixelProcessIdHandle;
-    GLuint m_fs_albedoTexHandle;
-
-    GLuint m_fs_kaHandle;
-    GLuint m_fs_kdHandle;
-    GLuint m_fs_ksHandle;
-    GLuint m_fs_nsHandle;
+    //
+    // GLuint m_projMatHandle;
+    // GLuint m_viewMatHandle;
+    // GLuint m_modelMatHandle;
+    // GLuint m_modelRotateMatHandle;
+    //
+    // GLuint m_materialHandle;
+    //
+    // GLuint m_fs_pixelProcessIdHandle;
+    // GLuint m_fs_albedoTexHandle;
+    //
+    // GLuint m_fs_kaHandle;
+    // GLuint m_fs_kdHandle;
+    // GLuint m_fs_ksHandle;
+    // GLuint m_fs_nsHandle;
 
     GLenum m_albedoTexUnit;
     GLenum m_normalTexUnit;

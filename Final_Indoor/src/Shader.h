@@ -3,6 +3,7 @@
 #include <fstream>
 #include <string>
 #include <sstream>
+#include <unordered_map>
 
 #include <glad/glad.h>
 
@@ -60,14 +61,15 @@ public:
     
     virtual ~ShaderProgram();
 
-public:
     bool init();
     bool attachShader(const Shader* shader);
     ShaderProgramStatus checkStatus();
     void linkProgram();
     void useProgram();
 
-public:
+    GLint getHandle(const char* key);
+    GLint operator[](const char* key);
+    
     GLuint programId() const;
     ShaderProgramStatus status() const;
 
@@ -76,6 +78,7 @@ private:
     bool m_vsReady = false;
     bool m_fsReady = false;
     bool m_csReady = false;
+    std::unordered_map<const char*, GLint> handles{};
 
     ShaderProgramStatus m_shaderProgramStatus{};
 };

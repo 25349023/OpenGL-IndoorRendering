@@ -232,6 +232,20 @@ void ShaderProgram::useProgram()
     glUseProgram(this->m_programId);
 }
 
+GLint ShaderProgram::getHandle(const char* key)
+{
+    if (handles.find(key) == handles.end())
+    {
+        handles[key] = glGetUniformLocation(m_programId, key);
+    }
+    return handles[key];
+}
+
+GLint ShaderProgram::operator[](const char* key)
+{
+    return getHandle(key);
+}
+
 GLuint ShaderProgram::programId() const
 {
     return this->m_programId;

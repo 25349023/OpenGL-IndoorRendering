@@ -93,19 +93,19 @@ void DeferredRenderer::beforeFirstStage()
     glBindFramebuffer(GL_FRAMEBUFFER, fbo);
     glDrawBuffers(attachedTexs.size(), drawBuffers.data());
     clear();
-    fbufShaderProgram->useProgram();
+    fbufSP->useProgram();
 }
 
 void DeferredRenderer::secondStage()
 {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     clear();
-    screenShaderProgram->useProgram();
+    screenSP->useProgram();
 
     glBindVertexArray(frameVao);
-    glUniform1i(activeTexHandle, activeTex);
-    glUniform3fv(cameraEyeHandle, 1, glm::value_ptr(camEye));
-    glUniform3fv(directionalLightHandle, 1, glm::value_ptr(dirLight));
+    glUniform1i((*screenSP)["activeTex"], activeTex);
+    glUniform3fv((*screenSP)["cameraEye"], 1, glm::value_ptr(camEye));
+    glUniform3fv((*screenSP)["directionalLight"], 1, glm::value_ptr(dirLight));
     
     for (int i = 0; i < GBUFFER_COUNT; ++i)
     {
@@ -127,19 +127,4 @@ void DeferredRenderer::clear()
         glClearBufferfv(GL_COLOR, i, COLOR);
     }
     glClearBufferfv(GL_DEPTH, 0, DEPTH);
-}
-
-void DeferredRenderer::setFbufShaderProgram(ShaderProgram* fbuf_shader_program)
-{
-    fbufShaderProgram = fbuf_shader_program;
-}
-
-void DeferredRenderer::setScreenShaderProgram(ShaderProgram* screen_shader_program)
-{
-    screenShaderProgram = screen_shader_program;
-    GLuint programId = screenShaderProgram->programId();
-
-    activeTexHandle = glGetUniformLocation(programId, "activeTex");
-    cameraEyeHandle = glGetUniformLocation(programId, "cameraEye");
-    directionalLightHandle = glGetUniformLocation(programId, "directionalLight");
 }

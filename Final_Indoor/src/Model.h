@@ -4,6 +4,7 @@
 
 #include "Shape.h"
 #include "Material.h"
+#include "Shader.h"
 
 struct Model
 {
@@ -24,7 +25,7 @@ struct Model
     void loadMeshes(const char* path);
     void loadMaterials(const char* path);
     void setTransform(glm::vec3 t, glm::vec3 r, glm::vec3 s);
-    void render();
+    void render(ShaderProgram* shaderProgram);
 
     static Model merge(std::vector<Model>& models);
 };

@@ -7,10 +7,8 @@ RenderSetting::~RenderSetting() {}
 
 void RenderSetting::prepareUniform()
 {
-    SceneManager* manager = SceneManager::Instance();
-
-    glUniformMatrix4fv(manager->m_projMatHandle, 1, false, glm::value_ptr(this->m_projMat));
-    glUniformMatrix4fv(manager->m_viewMatHandle, 1, false, glm::value_ptr(this->m_viewMat));
+    glUniformMatrix4fv((*m_shaderProgram)["projMat"], 1, false, glm::value_ptr(this->m_projMat));
+    glUniformMatrix4fv((*m_shaderProgram)["viewMat"], 1, false, glm::value_ptr(this->m_viewMat));
 }
 
 void RenderSetting::useProgram()
@@ -67,37 +65,18 @@ bool RenderSetting::setUpShader()
 
     this->m_shaderProgram->useProgram();
 
-    // shader attributes binding
-    const GLuint programId = this->m_shaderProgram->programId();
-
     SceneManager* manager = SceneManager::Instance();
     manager->m_vertexHandle = 0;
     manager->m_normalHandle = 1;
     manager->m_uvHandle = 2;
-    manager->m_offsetHandel = 3;
 
-    manager->m_modelMatHandle = glGetUniformLocation(programId, "modelMat");
-    manager->m_modelRotateMatHandle = glGetUniformLocation(programId, "modelRotateMat");
-    manager->m_viewMatHandle = glGetUniformLocation(programId, "viewMat");
-    manager->m_projMatHandle = glGetUniformLocation(programId, "projMat");
-
-    manager->m_materialHandle = glGetUniformLocation(programId, "matParams");
-    GLuint albedoTexHandle = glGetUniformLocation(programId, "albedoTexture");
-
-    glUniform1i(albedoTexHandle, 0);
+    glUniform1i((*m_shaderProgram)["albedoTexture"], 0);
 
     manager->m_albedoTexUnit = GL_TEXTURE0;
 
-    manager->m_fs_pixelProcessIdHandle = glGetUniformLocation(programId, "pixelProcessId");
     manager->m_fs_commonProcess = 0;
     manager->m_fs_textureMapping = 1;
     manager->m_fs_simpleShading = 2;
-
-    manager->m_fs_albedoTexHandle = glGetUniformLocation(programId, "albedoTex");
-    manager->m_fs_kaHandle = glGetUniformLocation(programId, "ka");
-    manager->m_fs_kdHandle = glGetUniformLocation(programId, "kd");
-    manager->m_fs_ksHandle = glGetUniformLocation(programId, "ks");
-    manager->m_fs_nsHandle = glGetUniformLocation(programId, "ns");
 
     return true;
 }

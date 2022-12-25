@@ -195,8 +195,8 @@ bool initializeGL()
     renderSetting->setViewport(0, 0, FRAME_WIDTH, FRAME_HEIGHT);
 
     deferredRenderer = new DeferredRenderer(GBUFFER_COUNT, glm::ivec2(FRAME_WIDTH, FRAME_HEIGHT));
-    deferredRenderer->setFbufShaderProgram(shaderProgram);
-    deferredRenderer->setScreenShaderProgram(screenShaderProgram);
+    deferredRenderer->fbufSP = shaderProgram;
+    deferredRenderer->screenSP = screenShaderProgram;
 
     // =================================================================
     // initialize camera
@@ -284,8 +284,8 @@ void paintGL()
     renderSetting->setView(playerViewMat);
     renderSetting->prepareUniform();
 
-    scene.render();
-    trice.render();
+    scene.render(deferredRenderer->fbufSP);
+    trice.render(deferredRenderer->fbufSP);
 
     deferredRenderer->secondStage();
 

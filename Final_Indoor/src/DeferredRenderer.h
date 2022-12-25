@@ -34,17 +34,14 @@ public:
 
     void clear();
 
-    void setFbufShaderProgram(ShaderProgram* fbuf_shader_program);
-    void setScreenShaderProgram(ShaderProgram* screen_shader_program);
-
     friend class MyImGuiPanel;
 
     glm::vec3 camEye{ 4.6, 1.2, -2.0 };
     glm::vec3 camCenter{ 4.5, 1.2, -2.0 };
 
+    ShaderProgram* fbufSP{};
+    ShaderProgram* screenSP{};
 private:
-    ShaderProgram* fbufShaderProgram{};
-    ShaderProgram* screenShaderProgram{};
 
     GLuint frameVao{};
     GLuint windowVbo{};
@@ -57,10 +54,6 @@ private:
     std::vector<GLenum> drawBuffers{};
     GLuint activeTex{};
     glm::vec3 dirLight{ -2.845, 2.028, -1.293 };
-
-    GLuint activeTexHandle;
-    GLuint cameraEyeHandle;
-    GLuint directionalLightHandle;
 
     glm::ivec2 winSize{};
 

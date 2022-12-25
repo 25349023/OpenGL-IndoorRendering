@@ -76,21 +76,25 @@ void Model::setTransform(glm::vec3 t, glm::vec3 r, glm::vec3 s)
     scaling = s;
 }
 
-void Model::render()
+void Model::render(ShaderProgram* shaderProgram)
 {
     auto sm = SceneManager::Instance();
+    auto& sp = *shaderProgram;
 
     glActiveTexture(GL_TEXTURE0);
-    glUniform1i(sm->m_fs_albedoTexHandle, 0);
+    glUniform1i(sp["albedoTex"], 0);
 
     glm::mat4 T(1.0), R(1.0), S(1.0);
     T = glm::translate(T, translation);
-    R = glm::mat4_cast(glm::quat(rotation));
+    if (rotation != glm::vec3(0.0))
+    {
+        R = glm::mat4_cast(glm::quat(rotation));
+    }
     S = glm::scale(S, scaling);
 
     glm::mat4 modelMat = T * R * S;
-    glUniformMatrix4fv(sm->m_modelMatHandle, 1, false, glm::value_ptr(modelMat));
-    glUniformMatrix4fv(sm->m_modelRotateMatHandle, 1, false, glm::value_ptr(R));
+    glUniformMatrix4fv(sp["modelMat"], 1, false, glm::value_ptr(modelMat));
+    glUniformMatrix4fv(sp["modelRotateMat"], 1, false, glm::value_ptr(R));
 
     for (const auto& shape : shapes)
     {
@@ -99,17 +103,17 @@ void Model::render()
 
         if (material.hasTex)
         {
-            glUniform1i(sm->m_fs_pixelProcessIdHandle, sm->m_fs_textureMapping);
+            glUniform1i(sp["pixelProcessId"], sm->m_fs_textureMapping);
         }
         else
         {
-            glUniform1i(sm->m_fs_pixelProcessIdHandle, sm->m_fs_simpleShading);
+            glUniform1i(sp["pixelProcessId"], sm->m_fs_simpleShading);
         }
 
-        glUniform3fv(sm->m_fs_kaHandle, 1, glm::value_ptr(material.ambient));
-        glUniform3fv(sm->m_fs_kdHandle, 1, glm::value_ptr(material.diffuse));
-        glUniform3fv(sm->m_fs_ksHandle, 1, glm::value_ptr(material.specular));
-        glUniform1f(sm->m_fs_nsHandle, material.shininess);
+        glUniform3fv(sp["ka"], 1, glm::value_ptr(material.ambient));
+        glUniform3fv(sp["kd"], 1, glm::value_ptr(material.diffuse));
+        glUniform3fv(sp["ks"], 1, glm::value_ptr(material.specular));
+        glUniform1f(sp["ns"], material.shininess);
 
         if (material.hasTex)
         {
