@@ -36,6 +36,7 @@ public:
     GLuint m_projMatHandle;
     GLuint m_viewMatHandle;
     GLuint m_modelMatHandle;
+    GLuint m_modelRotateMatHandle;
     GLuint m_instancedDrawHandle;
 
     GLuint m_materialHandle;
@@ -46,6 +47,7 @@ public:
     GLuint m_fs_kaHandle;
     GLuint m_fs_kdHandle;
     GLuint m_fs_ksHandle;
+    GLuint m_fs_nsHandle;
 
     GLenum m_albedoTexUnit;
     GLenum m_normalTexUnit;

@@ -90,6 +90,7 @@ void Model::render()
 
     glm::mat4 modelMat = T * R * S;
     glUniformMatrix4fv(sm->m_modelMatHandle, 1, false, glm::value_ptr(modelMat));
+    glUniformMatrix4fv(sm->m_modelRotateMatHandle, 1, false, glm::value_ptr(R));
 
     for (const auto& shape : shapes)
     {
@@ -108,6 +109,7 @@ void Model::render()
         glUniform3fv(sm->m_fs_kaHandle, 1, glm::value_ptr(material.ambient));
         glUniform3fv(sm->m_fs_kdHandle, 1, glm::value_ptr(material.diffuse));
         glUniform3fv(sm->m_fs_ksHandle, 1, glm::value_ptr(material.specular));
+        glUniform1f(sm->m_fs_nsHandle, material.shininess);
 
         if (material.hasTex)
         {

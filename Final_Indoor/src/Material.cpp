@@ -31,6 +31,8 @@ void Material::extractColorCoef(aiMaterial* aiMaterial)
     
     aiMaterial->Get(AI_MATKEY_COLOR_SPECULAR, color);
     specular = glm::vec3(color.r, color.g, color.b);
+    
+    aiMaterial->Get(AI_MATKEY_SHININESS, shininess);
 }
 
 void Material::bindTexture(const char* path)

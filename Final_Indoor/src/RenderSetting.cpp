@@ -77,6 +77,7 @@ bool RenderSetting::setUpShader()
     manager->m_offsetHandel = 3;
 
     manager->m_modelMatHandle = glGetUniformLocation(programId, "modelMat");
+    manager->m_modelRotateMatHandle = glGetUniformLocation(programId, "modelRotateMat");
     manager->m_viewMatHandle = glGetUniformLocation(programId, "viewMat");
     manager->m_projMatHandle = glGetUniformLocation(programId, "projMat");
 
@@ -96,6 +97,7 @@ bool RenderSetting::setUpShader()
     manager->m_fs_kaHandle = glGetUniformLocation(programId, "ka");
     manager->m_fs_kdHandle = glGetUniformLocation(programId, "kd");
     manager->m_fs_ksHandle = glGetUniformLocation(programId, "ks");
+    manager->m_fs_nsHandle = glGetUniformLocation(programId, "ns");
 
     return true;
 }

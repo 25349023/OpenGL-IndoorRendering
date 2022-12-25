@@ -217,7 +217,7 @@ void resizeGL(GLFWwindow* window, int w, int h)
 
 void updatePlayerViewMat()
 {
-    const float translateSpeed = 0.01f, rotateSpeed = 0.05f;
+    const float translateSpeed = 0.1f, rotateSpeed = 0.5f;
     const glm::vec3 translateZAmount = translateSpeed * playerLocalZ;
     const glm::vec3 translateYAmount = translateSpeed * playerLocalY;
 
