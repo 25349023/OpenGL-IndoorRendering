@@ -6,9 +6,9 @@
 #include "Shader.h"
 #include "GLM/glm.hpp"
 
-enum Attachments
+enum GBuffer
 {
-    DIFFUSE_COLOR, WORLD_VERTEX, WORLD_NORMAL
+    FRAG_COLOR, WORLD_VERTEX, WORLD_NORMAL, AMBIENT_COLOR, DIFFUSE_COLOR, SPECULAR_COLOR, GBUFFER_COUNT
 };
 
 class DeferredRenderer
@@ -26,6 +26,8 @@ public:
 
     ShaderProgram* fbufShaderProgram{};
     ShaderProgram* screenShaderProgram{};
+
+    friend class MyImGuiPanel;
 private:
     
     GLuint frameVao{};
@@ -44,5 +46,5 @@ private:
     void setupFrameBuffer();
 
     void genFBTexture(GLuint& tex, int attachment);
-    void activateFBTexture(Attachments target);
+    void activateFBTexture(GBuffer target);
 };

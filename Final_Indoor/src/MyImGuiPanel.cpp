@@ -22,10 +22,26 @@ void MyImGuiPanel::update()
 
     if (ImGui::CollapsingHeader("Camera settings"))
     {
-        float f[3] = {0};
         ImGui::InputFloat3("Camera Eye", glm::value_ptr(camEye));
         ImGui::InputFloat3("Camera LookAt", glm::value_ptr(camCenter));
-        // ImGui::TreePop();
+    }
+
+    if (ImGui::CollapsingHeader("G-Buffers"))
+    {
+        int* atexPtr = (int*)&deferredRenderer->activeTex;
+        auto& atexs = deferredRenderer->attachedTexs;
+
+        ImGui::RadioButton("Render Result", atexPtr, atexs[FRAG_COLOR]);
+        ImGui::SameLine();
+        ImGui::RadioButton("World Vertex", atexPtr, atexs[WORLD_VERTEX]);
+        ImGui::SameLine();
+        ImGui::RadioButton("World Normal", atexPtr, atexs[WORLD_NORMAL]);
+
+        ImGui::RadioButton("Ambient Color", atexPtr, atexs[AMBIENT_COLOR]);
+        ImGui::SameLine();
+        ImGui::RadioButton("Diffuse Color", atexPtr, atexs[DIFFUSE_COLOR]);
+        ImGui::SameLine();
+        ImGui::RadioButton("Specular Color", atexPtr, atexs[SPECULAR_COLOR]);
     }
 }
 

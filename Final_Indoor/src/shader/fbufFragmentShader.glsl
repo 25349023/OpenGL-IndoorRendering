@@ -11,5 +11,4 @@ in VS_OUT
 
 void main(void) {
     fragColor = texture(tex, fs_in.texcoord);
-//    fragColor = vec4(1, 1, 0, 1);
 }

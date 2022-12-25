@@ -7,6 +7,10 @@
 #include <string>
 #include <GLM/vec3.hpp>
 
+#include "DeferredRenderer.h"
+
+extern DeferredRenderer *deferredRenderer;
+
 class MyImGuiPanel
 {
 public:

@@ -43,7 +43,7 @@ void DeferredRenderer::setupFrameBuffer()
     {
         attachNewFBTexture();
     }
-    activateFBTexture(WORLD_NORMAL);
+    activateFBTexture(FRAG_COLOR);
 
     // Create Depth RBO
     glGenRenderbuffers(1, &depthRbo);
@@ -122,7 +122,7 @@ void DeferredRenderer::clear()
     glClearBufferfv(GL_DEPTH, 0, DEPTH);
 }
 
-void DeferredRenderer::activateFBTexture(Attachments target)
+void DeferredRenderer::activateFBTexture(GBuffer target)
 {
     activeTex = attachedTexs[target];
 }

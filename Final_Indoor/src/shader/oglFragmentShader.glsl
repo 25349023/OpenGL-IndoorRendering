@@ -9,6 +9,9 @@ in vec3 f_uv;
 layout (location = 0) out vec4 fragColor;
 layout (location = 1) out vec4 worldSpaceVertex;
 layout (location = 2) out vec4 worldSpaceNormal;
+layout (location = 3) out vec4 ambientColorMap;
+layout (location = 4) out vec4 diffuseColorMap;
+layout (location = 5) out vec4 specularColorMap;
 
 uniform int pixelProcessId;
 uniform sampler2D albedoTex;
@@ -59,6 +62,15 @@ void phong_shading() {
     fragColor = vec4(ambient + diffuse + specular, 1.0);
 }
 
+vec4 diffuse_color() {
+    if (pixelProcessId == 1) {
+        return texture(albedoTex, f_uv.xy);
+    }
+    else if (pixelProcessId == 2) {
+        return vec4(kd, 1.0);
+    }
+}
+
 void main() {
     if (pixelProcessId == 1) {
         texture_mapping();
@@ -66,6 +78,9 @@ void main() {
     else if (pixelProcessId == 2) {
         simple_shading();
     }
-    worldSpaceVertex = vec4(normalize(f_worldVertex) * 0.5 + 0.5, 1);
-    worldSpaceNormal = vec4(normalize(f_worldNormal) * 0.5 + 0.5, 1);
+    worldSpaceVertex = vec4(normalize(f_worldVertex) * 0.5 + 0.5, 1.0);
+    worldSpaceNormal = vec4(normalize(f_worldNormal) * 0.5 + 0.5, 1.0);
+    ambientColorMap = vec4(ka, 1.0);
+    diffuseColorMap = diffuse_color();
+    specularColorMap = vec4(ks, 1.0);
 }
