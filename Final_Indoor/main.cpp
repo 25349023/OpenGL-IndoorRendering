@@ -159,10 +159,10 @@ void gameLoop(GLFWwindow* window)
 void initScene()
 {
     scene = Model("assets/indoor/Grey_White_Room.obj", "assets/indoor/");
-    scene.setTransform(glm::vec3(-20, 0.0, -35), glm::vec3(0, glm::radians(-80.0f), 0), glm::vec3(10.0));
+    scene.setTransform(glm::vec3(0), glm::vec3(0), glm::vec3(1.0));
 
     trice = Model("assets/indoor/trice.obj", "assets/indoor/");
-    trice.setTransform(glm::vec3(2.0, 6.3, -17), glm::vec3(0, glm::radians(-80.0f), 0), glm::vec3(0.01));
+    trice.setTransform(glm::vec3(2.05, 0.628725, -1.9), glm::vec3(0), glm::vec3(0.001));
 }
 
 bool initializeGL()
@@ -217,7 +217,7 @@ void resizeGL(GLFWwindow* window, int w, int h)
 
 void updatePlayerViewMat()
 {
-    const float translateSpeed = 0.1f, rotateSpeed = 0.5f;
+    const float translateSpeed = 0.01f, rotateSpeed = 0.5f;
     const glm::vec3 translateZAmount = translateSpeed * playerLocalZ;
     const glm::vec3 translateYAmount = translateSpeed * playerLocalY;
 

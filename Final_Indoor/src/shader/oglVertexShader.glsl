@@ -19,17 +19,24 @@ uniform mat4 modelRotateMat;
 
 uniform vec3 directionalLight = vec3(-2.845, 2.028, -1.293);
 
+vec3 check_normalize(vec3 v) {
+    if (v == vec3(0.0)) {
+        return v;
+    }
+    return normalize(v);
+}
+
 void commonProcess() {
     mat4 modelViewMat = viewMat * modelMat;
     vec4 viewVertex = modelViewMat * vec4(v_vertex, 1.0);
-    vec4 viewNormal = modelRotateMat * vec4(v_normal, 0.0);
+    vec4 viewNormal = viewMat * modelRotateMat * vec4(v_normal, 0.0);
     vec4 viewLight = viewMat * vec4(directionalLight, 0.0);
 
-    f_viewVertex = normalize(viewVertex.xyz);
+    f_viewVertex = check_normalize(viewVertex.xyz);
     f_viewNormal = normalize(viewNormal.xyz);
-    f_viewDirLight = normalize(directionalLight.xyz);
-    f_worldVertex = (modelMat * vec4(v_vertex, 1.0)).xyz;
-    f_worldNormal = (modelMat * vec4(v_normal, 0.0)).xyz;
+    f_viewDirLight = normalize(viewLight.xyz);
+    f_worldVertex = check_normalize((modelMat * vec4(v_vertex, 1.0)).xyz);
+    f_worldNormal = normalize((modelMat * vec4(v_normal, 0.0)).xyz);
     f_uv = v_uv;
 
     gl_Position = projMat * viewVertex;
