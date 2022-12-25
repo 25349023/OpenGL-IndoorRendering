@@ -5,11 +5,12 @@ layout (location = 0) uniform sampler2D tex[7];
 layout (location = 0) out vec4 fragColor;
 
 uniform int activeTex;
-uniform vec3 directionalLight = vec3(-2.845, 2.028, -1.293);
+uniform vec3 cameraEye;
+uniform vec3 directionalLight;
 
-uniform vec3 lightAmbient = vec3(0.1);
-uniform vec3 lightDiffuse = vec3(0.7);
-uniform vec3 lightSpecular = vec3(0.7);
+uniform vec3 Ia = vec3(0.1);
+uniform vec3 Id = vec3(0.7);
+uniform vec3 Is = vec3(0.2);
 
 in VS_OUT
 {
@@ -24,8 +25,11 @@ vec3 check_normalize(vec3 v) {
 }
 
 vec4 blinn_phong_shading() {
-    vec3 V = check_normalize(texture(tex[1], fs_in.texcoord).xyz);
-    vec3 N = normalize(texture(tex[2], fs_in.texcoord).xyz);
+    vec3 worldVertex = texture(tex[1], fs_in.texcoord).xyz;
+    vec3 worldNormal = texture(tex[2], fs_in.texcoord).xyz;
+    
+    vec3 V = check_normalize(cameraEye - worldVertex);
+    vec3 N = normalize(worldNormal);
     vec3 L = normalize(directionalLight);
     vec3 H = normalize(L + V);
 
@@ -34,9 +38,9 @@ vec4 blinn_phong_shading() {
     vec3 ks = texture(tex[5], fs_in.texcoord).xyz;
     float ns = texture(tex[6], fs_in.texcoord).x;
 
-    vec3 ambient = lightAmbient * ka;
-    vec3 diffuse = lightDiffuse * max(dot(N, L), 0.0) * kd;
-    vec3 specular = lightSpecular * pow(max(dot(N, H), 0.0), ns) * ks;
+    vec3 ambient = Ia * ka;
+    vec3 diffuse = Id * max(dot(N, L), 0.0) * kd;
+    vec3 specular = Is * pow(max(dot(N, H), 0.0), ns) * ks;
 
     return vec4(ambient + diffuse + specular, 1.0);
 }

@@ -104,7 +104,9 @@ void DeferredRenderer::secondStage()
 
     glBindVertexArray(frameVao);
     glUniform1i(activeTexHandle, activeTex);
+    glUniform3fv(cameraEyeHandle, 1, glm::value_ptr(camEye));
     glUniform3fv(directionalLightHandle, 1, glm::value_ptr(dirLight));
+    
     for (int i = 0; i < GBUFFER_COUNT; ++i)
     {
         glUniform1i(i, i);
@@ -138,5 +140,6 @@ void DeferredRenderer::setScreenShaderProgram(ShaderProgram* screen_shader_progr
     GLuint programId = screenShaderProgram->programId();
 
     activeTexHandle = glGetUniformLocation(programId, "activeTex");
+    cameraEyeHandle = glGetUniformLocation(programId, "cameraEye");
     directionalLightHandle = glGetUniformLocation(programId, "directionalLight");
 }

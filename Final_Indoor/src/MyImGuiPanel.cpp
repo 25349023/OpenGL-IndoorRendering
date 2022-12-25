@@ -22,14 +22,14 @@ void MyImGuiPanel::update()
 
     if (ImGui::CollapsingHeader("Camera settings"))
     {
-        ImGui::InputFloat3("Camera Eye", glm::value_ptr(camEye));
-        ImGui::InputFloat3("Camera LookAt", glm::value_ptr(camCenter));
+        ImGui::InputFloat3("Camera Eye", glm::value_ptr(deferredRenderer->camEye));
+        ImGui::InputFloat3("Camera LookAt", glm::value_ptr(deferredRenderer->camCenter));
     }
 
     if (ImGui::CollapsingHeader("G-Buffers"))
     {
         int* atexPtr = (int*)&deferredRenderer->activeTex;
-        auto& atexs = deferredRenderer->attachedTexs;
+        // auto& atexs = deferredRenderer->attachedTexs;
 
         ImGui::RadioButton("Render Result", atexPtr, FRAG_COLOR);
         ImGui::SameLine();

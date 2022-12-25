@@ -11,6 +11,7 @@ public:
     virtual ~RenderSetting();
     
     friend class MyImGuiPanel;
+    friend class DeferredRenderer;
 
 private:
     ShaderProgram* m_shaderProgram = nullptr;

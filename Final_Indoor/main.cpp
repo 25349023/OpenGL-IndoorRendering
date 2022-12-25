@@ -75,7 +75,7 @@ int main()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    GLFWwindow* window = glfwCreateWindow(FRAME_WIDTH, FRAME_HEIGHT, "111062566_AS3", nullptr, nullptr);
+    GLFWwindow* window = glfwCreateWindow(FRAME_WIDTH, FRAME_HEIGHT, "Final Indoor", nullptr, nullptr);
     if (window == nullptr)
     {
         std::cout << "failed to create GLFW window\n";
@@ -223,45 +223,45 @@ void updatePlayerViewMat()
 
     if (keyDown[KEY_W])
     {
-        m_imguiPanel->camEye += translateZAmount;
-        m_imguiPanel->camCenter += translateZAmount;
+        deferredRenderer->camEye += translateZAmount;
+        deferredRenderer->camCenter += translateZAmount;
     }
     else if (keyDown[KEY_S])
     {
-        m_imguiPanel->camEye -= translateZAmount;
-        m_imguiPanel->camCenter -= translateZAmount;
+        deferredRenderer->camEye -= translateZAmount;
+        deferredRenderer->camCenter -= translateZAmount;
     }
 
     if (keyDown[KEY_Z])
     {
-        m_imguiPanel->camEye += translateYAmount;
-        m_imguiPanel->camCenter += translateYAmount;
+        deferredRenderer->camEye += translateYAmount;
+        deferredRenderer->camCenter += translateYAmount;
     }
     else if (keyDown[KEY_X])
     {
-        m_imguiPanel->camEye -= translateYAmount;
-        m_imguiPanel->camCenter -= translateYAmount;
+        deferredRenderer->camEye -= translateYAmount;
+        deferredRenderer->camCenter -= translateYAmount;
     }
 
     if (keyDown[KEY_A])
     {
-        m_imguiPanel->camCenter = rotateCenterAccordingToEye(
-            m_imguiPanel->camCenter, m_imguiPanel->camEye, playerViewMat, glm::radians(rotateSpeed));
+        deferredRenderer->camCenter = rotateCenterAccordingToEye(
+            deferredRenderer->camCenter, deferredRenderer->camEye, playerViewMat, glm::radians(rotateSpeed));
         recalculatePlayerLocals();
     }
     else if (keyDown[KEY_D])
     {
-        m_imguiPanel->camCenter = rotateCenterAccordingToEye(
-            m_imguiPanel->camCenter, m_imguiPanel->camEye, playerViewMat, glm::radians(-rotateSpeed));
+        deferredRenderer->camCenter = rotateCenterAccordingToEye(
+            deferredRenderer->camCenter, deferredRenderer->camEye, playerViewMat, glm::radians(-rotateSpeed));
         recalculatePlayerLocals();
     }
 
-    playerViewMat = glm::lookAt(m_imguiPanel->camEye, m_imguiPanel->camCenter, playerUp);
+    playerViewMat = glm::lookAt(deferredRenderer->camEye, deferredRenderer->camCenter, playerUp);
 }
 
 void recalculatePlayerLocals()
 {
-    playerLocalZ = m_imguiPanel->camCenter - m_imguiPanel->camEye;
+    playerLocalZ = deferredRenderer->camCenter - deferredRenderer->camEye;
     playerLocalZ.y = 0;
     playerLocalZ = glm::normalize(playerLocalZ);
 
@@ -279,7 +279,7 @@ void paintGL()
     // ===============================
     // start new frame
     deferredRenderer->beforeFirstStage();
-    
+
     renderSetting->setProjection(playerProjMat);
     renderSetting->setView(playerViewMat);
     renderSetting->prepareUniform();

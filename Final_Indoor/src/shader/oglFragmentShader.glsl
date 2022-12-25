@@ -1,8 +1,5 @@
 #version 430 core
 
-in vec3 f_viewVertex;
-in vec3 f_viewNormal;
-in vec3 f_viewDirLight;
 in vec3 f_worldVertex;
 in vec3 f_worldNormal;
 in vec3 f_uv;
@@ -48,25 +45,6 @@ vec4 diffuse_color() {
     else if (pixelProcessId == 2) {
         return vec4(kd, 1.0);
     }
-}
-
-vec4 blinn_phong_shading() {
-    vec3 N = normalize(f_viewNormal);
-    vec3 L = normalize(f_viewDirLight);
-    vec3 V = normalize(f_viewVertex);
-    vec3 H = normalize(L + V);
-
-    vec4 albedo;
-    albedo = diffuse_color();
-    if (albedo.a < 0.5) {
-        discard;
-    }
-
-    vec3 ambient = lightAmbient * ka;
-    vec3 diffuse = lightDiffuse * max(dot(N, L), 0.0) * albedo.xyz;
-    vec3 specular = lightSpecular * pow(max(dot(N, H), 0.0), ns) * ks;
-
-    return vec4(ambient + diffuse + specular, 1.0);
 }
 
 void main() {

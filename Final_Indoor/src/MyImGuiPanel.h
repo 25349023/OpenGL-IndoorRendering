@@ -15,9 +15,6 @@ extern DeferredRenderer *deferredRenderer;
 class MyImGuiPanel
 {
 public:
-    glm::vec3 camEye{ 4.6, 1.2, -2.0 };
-    glm::vec3 camCenter{ 4.5, 1.2, -2.0 };
-
     MyImGuiPanel();
     virtual ~MyImGuiPanel();
 
