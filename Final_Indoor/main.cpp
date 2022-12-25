@@ -29,7 +29,6 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 void gameLoop(GLFWwindow* window);
 
 void updateViewMat();
-void recalculatePlayerLocals();
 bool initializeGL();
 void resizeGL(GLFWwindow* window, int w, int h);
 void paintGL();
@@ -48,9 +47,6 @@ MyImGuiPanel* m_imguiPanel = nullptr;
 
 // ==============================================
 DeferredRenderer* deferredRenderer = nullptr;
-
-glm::vec3 playerUp(0.0, 1.0, 0.0);
-glm::vec3 playerLocalZ(0, 0, -1), playerLocalY(0, 1, 0);
 
 // ==============================================
 
@@ -206,55 +202,37 @@ void resizeGL(GLFWwindow* window, int w, int h)
 void updateViewMat()
 {
     const float translateSpeed = 0.01f, rotateSpeed = 0.5f;
-    const glm::vec3 translateZAmount = translateSpeed * playerLocalZ;
-    const glm::vec3 translateYAmount = translateSpeed * playerLocalY;
+    const glm::vec3 translateZAmount = translateSpeed * deferredRenderer->camLocalZ;
+    const glm::vec3 translateYAmount = translateSpeed * deferredRenderer->camLocalY;
 
     if (keyDown[KEY_W])
     {
-        deferredRenderer->camEye += translateZAmount;
-        deferredRenderer->camCenter += translateZAmount;
+        deferredRenderer->translateCamera(translateZAmount);
     }
     else if (keyDown[KEY_S])
     {
-        deferredRenderer->camEye -= translateZAmount;
-        deferredRenderer->camCenter -= translateZAmount;
+        deferredRenderer->translateCamera(-translateZAmount);
     }
 
     if (keyDown[KEY_Z])
     {
-        deferredRenderer->camEye += translateYAmount;
-        deferredRenderer->camCenter += translateYAmount;
+        deferredRenderer->translateCamera(translateYAmount);
     }
     else if (keyDown[KEY_X])
     {
-        deferredRenderer->camEye -= translateYAmount;
-        deferredRenderer->camCenter -= translateYAmount;
+        deferredRenderer->translateCamera(-translateYAmount);
     }
 
     if (keyDown[KEY_A])
     {
-        deferredRenderer->camCenter = rotateCenterAccordingToEye(
-            deferredRenderer->camCenter, deferredRenderer->camEye, deferredRenderer->viewMat, glm::radians(rotateSpeed));
-        recalculatePlayerLocals();
+        deferredRenderer->rotateCamera(glm::radians(rotateSpeed));
     }
     else if (keyDown[KEY_D])
     {
-        deferredRenderer->camCenter = rotateCenterAccordingToEye(
-            deferredRenderer->camCenter, deferredRenderer->camEye, deferredRenderer->viewMat, glm::radians(-rotateSpeed));
-        recalculatePlayerLocals();
+        deferredRenderer->rotateCamera(glm::radians(-rotateSpeed));
     }
 
-    deferredRenderer->viewMat = glm::lookAt(deferredRenderer->camEye, deferredRenderer->camCenter, playerUp);
-}
-
-void recalculatePlayerLocals()
-{
-    playerLocalZ = deferredRenderer->camCenter - deferredRenderer->camEye;
-    playerLocalZ.y = 0;
-    playerLocalZ = glm::normalize(playerLocalZ);
-
-    glm::vec3 side = glm::cross(playerLocalZ, playerUp);
-    playerLocalY = glm::normalize(glm::cross(side, playerLocalZ));
+    deferredRenderer->updateViewMat();
 }
 
 void paintGL()

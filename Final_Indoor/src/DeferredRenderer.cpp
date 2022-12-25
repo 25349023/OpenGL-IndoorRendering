@@ -89,6 +89,41 @@ int DeferredRenderer::attachNewFBTexture()
     return idx;
 }
 
+void DeferredRenderer::rotateCamera(const float rad) {
+    glm::mat4 vt = glm::transpose(viewMat);
+    glm::vec4 yAxisVec4 = vt[1];
+    glm::vec3 yAxis(yAxisVec4.x, yAxisVec4.y, yAxisVec4.z);
+    glm::quat q = glm::angleAxis(rad, yAxis);
+    glm::mat4 rotMat = glm::toMat4(q);
+    glm::vec3 p = camCenter - camEye;
+    glm::vec4 resP = rotMat * glm::vec4(p.x, p.y, p.z, 1.0);
+
+    camCenter = glm::vec3(resP.x + camEye.x, resP.y + camEye.y, resP.z + camEye.z);
+    recalculateCameraLocals();
+}
+
+void DeferredRenderer::recalculateCameraLocals()
+{
+    camLocalZ = camCenter - camEye;
+    camLocalZ.y = 0;
+    camLocalZ = glm::normalize(camLocalZ);
+
+    glm::vec3 side = glm::cross(camLocalZ, camUp);
+    camLocalY = glm::normalize(glm::cross(side, camLocalZ));
+
+}
+
+void DeferredRenderer::updateViewMat()
+{
+    viewMat = glm::lookAt(camEye, camCenter, camUp);
+}
+
+void DeferredRenderer::translateCamera(glm::vec3 amount)
+{
+    camEye += amount;
+    camCenter += amount;
+}
+
 void DeferredRenderer::prepareFirstStage()
 {
     glBindFramebuffer(GL_FRAMEBUFFER, fbo);
