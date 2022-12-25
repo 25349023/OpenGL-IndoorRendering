@@ -195,8 +195,8 @@ bool initializeGL()
     renderSetting->setViewport(0, 0, FRAME_WIDTH, FRAME_HEIGHT);
 
     deferredRenderer = new DeferredRenderer(GBUFFER_COUNT, glm::ivec2(FRAME_WIDTH, FRAME_HEIGHT));
-    deferredRenderer->fbufShaderProgram = shaderProgram;
-    deferredRenderer->screenShaderProgram = screenShaderProgram;
+    deferredRenderer->setFbufShaderProgram(shaderProgram);
+    deferredRenderer->setScreenShaderProgram(screenShaderProgram);
 
     // =================================================================
     // initialize camera

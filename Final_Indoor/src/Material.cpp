@@ -2,6 +2,9 @@
 
 #include <cstring>
 #define STB_IMAGE_IMPLEMENTATION
+#include <iostream>
+#include <ostream>
+
 #include "stb_image.h"
 
 texture_data loadImg(const char* path)

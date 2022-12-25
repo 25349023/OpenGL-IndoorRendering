@@ -1,5 +1,7 @@
 #include "DeferredRenderer.h"
 
+#include <GLM/gtc/type_ptr.hpp>
+
 DeferredRenderer::DeferredRenderer(int na, glm::vec2 ws)
 {
     winSize = ws;
@@ -43,7 +45,7 @@ void DeferredRenderer::setupFrameBuffer()
     {
         attachNewFBTexture();
     }
-    activateFBTexture(FRAG_COLOR);
+    activeTex = FRAG_COLOR;
 
     // Create Depth RBO
     glGenRenderbuffers(1, &depthRbo);
@@ -59,8 +61,8 @@ void DeferredRenderer::genFBTexture(GLuint& tex, int attachment)
 {
     glGenTextures(1, &tex);
     glBindTexture(GL_TEXTURE_2D, tex);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA,
-        winSize.x, winSize.y, 0, GL_RGBA,GL_UNSIGNED_BYTE, NULL);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F,
+        winSize.x, winSize.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -96,16 +98,19 @@ void DeferredRenderer::beforeFirstStage()
 
 void DeferredRenderer::secondStage()
 {
-    const int fbtexLoc = 0;
-
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     clear();
     screenShaderProgram->useProgram();
 
-    glUniform1i(fbtexLoc, 0);
     glBindVertexArray(frameVao);
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, activeTex);
+    glUniform1i(activeTexHandle, activeTex);
+    glUniform3fv(directionalLightHandle, 1, glm::value_ptr(dirLight));
+    for (int i = 0; i < GBUFFER_COUNT; ++i)
+    {
+        glUniform1i(i, i);
+        glActiveTexture(GL_TEXTURE0 + i);
+        glBindTexture(GL_TEXTURE_2D, attachedTexs[i]);
+    }
     glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
     glBindVertexArray(0);
 }
@@ -122,7 +127,16 @@ void DeferredRenderer::clear()
     glClearBufferfv(GL_DEPTH, 0, DEPTH);
 }
 
-void DeferredRenderer::activateFBTexture(GBuffer target)
+void DeferredRenderer::setFbufShaderProgram(ShaderProgram* fbuf_shader_program)
 {
-    activeTex = attachedTexs[target];
+    fbufShaderProgram = fbuf_shader_program;
+}
+
+void DeferredRenderer::setScreenShaderProgram(ShaderProgram* screen_shader_program)
+{
+    screenShaderProgram = screen_shader_program;
+    GLuint programId = screenShaderProgram->programId();
+
+    activeTexHandle = glGetUniformLocation(programId, "activeTex");
+    directionalLightHandle = glGetUniformLocation(programId, "directionalLight");
 }

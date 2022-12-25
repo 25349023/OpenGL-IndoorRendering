@@ -37,7 +37,6 @@ public:
     GLuint m_viewMatHandle;
     GLuint m_modelMatHandle;
     GLuint m_modelRotateMatHandle;
-    GLuint m_instancedDrawHandle;
 
     GLuint m_materialHandle;
 

@@ -9,11 +9,14 @@ class RenderSetting
 public:
     RenderSetting();
     virtual ~RenderSetting();
+    
+    friend class MyImGuiPanel;
 
 private:
     ShaderProgram* m_shaderProgram = nullptr;
     glm::mat4 m_projMat;
     glm::mat4 m_viewMat;
+    
     int m_frameWidth;
     int m_frameHeight;
 

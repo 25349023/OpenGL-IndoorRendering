@@ -31,18 +31,24 @@ void MyImGuiPanel::update()
         int* atexPtr = (int*)&deferredRenderer->activeTex;
         auto& atexs = deferredRenderer->attachedTexs;
 
-        ImGui::RadioButton("Render Result", atexPtr, atexs[FRAG_COLOR]);
+        ImGui::RadioButton("Render Result", atexPtr, FRAG_COLOR);
         ImGui::SameLine();
-        ImGui::RadioButton("World Vertex", atexPtr, atexs[WORLD_VERTEX]);
+        ImGui::RadioButton("World Vertex", atexPtr, WORLD_VERTEX);
         ImGui::SameLine();
-        ImGui::RadioButton("World Normal", atexPtr, atexs[WORLD_NORMAL]);
+        ImGui::RadioButton("World Normal", atexPtr, WORLD_NORMAL);
 
-        ImGui::RadioButton("Ambient Color", atexPtr, atexs[AMBIENT_COLOR]);
+        ImGui::RadioButton("Ambient Color", atexPtr, AMBIENT_COLOR);
         ImGui::SameLine();
-        ImGui::RadioButton("Diffuse Color", atexPtr, atexs[DIFFUSE_COLOR]);
+        ImGui::RadioButton("Diffuse Color", atexPtr, DIFFUSE_COLOR);
         ImGui::SameLine();
-        ImGui::RadioButton("Specular Color", atexPtr, atexs[SPECULAR_COLOR]);
+        ImGui::RadioButton("Specular Color", atexPtr, SPECULAR_COLOR);
     }
+    
+    if (ImGui::CollapsingHeader("Directional Light"))
+    {
+        ImGui::DragFloat3("Direction", glm::value_ptr(deferredRenderer->dirLight), 0.2);
+    }
+    
 }
 
 void MyImGuiPanel::setAvgFPS(const double avgFPS)

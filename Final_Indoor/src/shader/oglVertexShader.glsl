@@ -36,7 +36,7 @@ void commonProcess() {
     f_viewNormal = normalize(viewNormal.xyz);
     f_viewDirLight = normalize(viewLight.xyz);
     f_worldVertex = check_normalize((modelMat * vec4(v_vertex, 1.0)).xyz);
-    f_worldNormal = normalize((modelMat * vec4(v_normal, 0.0)).xyz);
+    f_worldNormal = normalize((modelRotateMat * vec4(v_normal, 0.0)).xyz);
     f_uv = v_uv;
 
     gl_Position = projMat * viewVertex;
