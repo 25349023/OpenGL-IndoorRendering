@@ -23,7 +23,12 @@ enum GBuffer
     GBUFFER_COUNT
 };
 
-enum Feature { BLINN_PHONG_SHADING, FEATURE_COUNT };
+enum Feature
+{
+    BLINN_PHONG_SHADING,
+    DIR_SHADOW_MAPPING,
+    FEATURE_COUNT
+};
 
 class DeferredRenderer
 {

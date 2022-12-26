@@ -8,7 +8,7 @@ uniform int activeTex;
 uniform vec3 cameraEye;
 uniform vec3 directionalLight;
 
-uniform bool enableFeature[1];
+uniform bool enableFeature[2];
 
 uniform vec3 Ia = vec3(0.1);
 uniform vec3 Id = vec3(0.7);
@@ -44,7 +44,12 @@ vec4 blinn_phong_shading() {
     vec3 diffuse = Id * max(dot(N, L), 0.0) * kd;
     vec3 specular = Is * pow(max(dot(N, H), 0.0), ns) * ks;
 
-    return vec4(ambient + diffuse + specular, 1.0);
+    float shadow = 1.0;
+    if (enableFeature[1]) {
+        shadow = texture(tex[7], fs_in.texcoord).x;
+    }
+    
+    return vec4(shadow * (ambient + diffuse + specular), 1.0);
 }
 
 void main(void) {

@@ -29,7 +29,6 @@ void MyImGuiPanel::update()
     if (ImGui::CollapsingHeader("G-Buffers"))
     {
         int* atexPtr = (int*)&deferredRenderer->activeTex;
-        // auto& atexs = deferredRenderer->attachedTexs;
 
         ImGui::RadioButton("Render Result", atexPtr, FRAG_COLOR);
         ImGui::SameLine();
@@ -48,8 +47,16 @@ void MyImGuiPanel::update()
     auto enable = deferredRenderer->enableFeature.data();
     if (ImGui::CollapsingHeader("Blinn-Phong Shading"))
     {
+        ImGui::PushID(BLINN_PHONG_SHADING);
         ImGui::Checkbox("Enable", enable + BLINN_PHONG_SHADING);
+        ImGui::PopID();
         ImGui::DragFloat3("Light Position", glm::value_ptr(deferredRenderer->nearDirLight), 0.2);
+    }
+    if (ImGui::CollapsingHeader("Directional Shadow Mapping"))
+    {
+        ImGui::PushID(DIR_SHADOW_MAPPING);
+        ImGui::Checkbox("Enable", enable + DIR_SHADOW_MAPPING);
+        ImGui::PopID();
     }
 }
 

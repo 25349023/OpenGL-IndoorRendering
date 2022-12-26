@@ -67,8 +67,8 @@ public:
     void linkProgram();
     void useProgram();
 
-    GLint getHandle(const char* key);
-    GLint operator[](const char* key);
+    GLint getHandle(std::string key);
+    GLint operator[](std::string key);
     
     GLuint programId() const;
     ShaderProgramStatus status() const;
@@ -78,7 +78,7 @@ private:
     bool m_vsReady = false;
     bool m_fsReady = false;
     bool m_csReady = false;
-    std::unordered_map<const char*, GLint> handles{};
+    std::unordered_map<std::string, GLint> handles{};
 
     ShaderProgramStatus m_shaderProgramStatus{};
 };
