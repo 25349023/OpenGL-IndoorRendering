@@ -42,6 +42,7 @@ void MyImGuiPanel::update()
         ImGui::RadioButton("Diffuse Color", atexPtr, DIFFUSE_COLOR);
         ImGui::SameLine();
         ImGui::RadioButton("Specular Color", atexPtr, SPECULAR_COLOR);
+        ImGui::RadioButton("Shadow Map", atexPtr, SHADOW_MAP);
     }
 
     auto enable = deferredRenderer->enableFeature.data();

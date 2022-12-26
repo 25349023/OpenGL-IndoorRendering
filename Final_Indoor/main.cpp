@@ -10,6 +10,7 @@
 #include "assimp/scene.h"
 #include "assimp/postprocess.h"
 #include "src/DeferredRenderer.h"
+#include "src/DirectionalShadowMapper.h"
 
 #include "src/Shape.h"
 #include "src/Material.h"
@@ -152,7 +153,10 @@ void initScene()
     scene.setTransform(glm::vec3(0), glm::vec3(0), glm::vec3(1.0));
 
     trice = Model("assets/indoor/trice.obj", "assets/indoor/");
-    trice.setTransform(glm::vec3(2.05, 0.628725, -1.9), glm::vec3(0), glm::vec3(0.001));
+    trice.setTransform(glm::vec3(2.05, 0.628725, -1.9), glm::vec3(0), glm::vec3(0.001f));
+
+    deferredRenderer->appendSceneObj(&scene);
+    deferredRenderer->appendSceneObj(&trice);
 }
 
 bool initializeGL()
@@ -172,15 +176,24 @@ bool initializeGL()
         return false;
     }
 
+    ShaderProgram* depthShaderProgram = new ShaderProgram(
+        "src\\shader\\depthVertexShader.glsl", "src\\shader\\depthFragmentShader.glsl");
+    if (depthShaderProgram->status() != ShaderProgramStatus::READY)
+    {
+        return false;
+    }
+
     // =================================================================
     m_imguiPanel = new MyImGuiPanel();
 
     // =================================================================
     // init renderer
 
-    deferredRenderer = new DeferredRenderer(GBUFFER_COUNT, glm::ivec2(FRAME_WIDTH, FRAME_HEIGHT));
+    deferredRenderer = new DeferredRenderer(glm::ivec2(FRAME_WIDTH, FRAME_HEIGHT));
     deferredRenderer->fbufSP = shaderProgram;
     deferredRenderer->screenSP = screenShaderProgram;
+
+    deferredRenderer->dirShadowMapper = new DirectionalShadowMapper(depthShaderProgram);
 
     // =================================================================
     // initialize camera
@@ -244,11 +257,8 @@ void paintGL()
     updateViewMat();
     // ===============================
     // start new frame
-    deferredRenderer->prepareFirstStage();
-
-    scene.render(deferredRenderer->fbufSP);
-    trice.render(deferredRenderer->fbufSP);
-
+    deferredRenderer->shadowMapStage();
+    deferredRenderer->firstStage();
     deferredRenderer->secondStage();
 
     // ===============================

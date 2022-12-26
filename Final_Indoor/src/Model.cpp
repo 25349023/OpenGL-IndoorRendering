@@ -76,7 +76,7 @@ void Model::setTransform(glm::vec3 t, glm::vec3 r, glm::vec3 s)
     scaling = s;
 }
 
-void Model::render(ShaderProgram* shaderProgram)
+void Model::render(ShaderProgram* shaderProgram, glm::mat4 shadowSbpvMat)
 {
     auto sm = SceneManager::Instance();
     auto& sp = *shaderProgram;
@@ -84,17 +84,12 @@ void Model::render(ShaderProgram* shaderProgram)
     glActiveTexture(GL_TEXTURE0);
     glUniform1i(sp["albedoTex"], 0);
 
-    glm::mat4 T(1.0), R(1.0), S(1.0);
-    T = glm::translate(T, translation);
-    if (rotation != glm::vec3(0.0))
-    {
-        R = glm::mat4_cast(glm::quat(rotation));
-    }
-    S = glm::scale(S, scaling);
+    auto mMat = getModelMat();
+    glUniformMatrix4fv(sp["modelMat"], 1, false, glm::value_ptr(mMat.first));
+    glUniformMatrix4fv(sp["modelRotateMat"], 1, false, glm::value_ptr(mMat.second));
 
-    glm::mat4 modelMat = T * R * S;
-    glUniformMatrix4fv(sp["modelMat"], 1, false, glm::value_ptr(modelMat));
-    glUniformMatrix4fv(sp["modelRotateMat"], 1, false, glm::value_ptr(R));
+    glm::mat4 shadowMat = shadowSbpvMat * mMat.first;
+    glUniformMatrix4fv(sp["shadowMat"], 1, false, glm::value_ptr(shadowMat));
 
     for (const auto& shape : shapes)
     {
@@ -122,6 +117,19 @@ void Model::render(ShaderProgram* shaderProgram)
         glDrawElements(GL_TRIANGLES, shape.drawCount, GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
     }
+}
+
+std::pair<glm::mat4, glm::mat4> Model::getModelMat()
+{
+    glm::mat4 T(1.0), R(1.0), S(1.0);
+    T = glm::translate(T, translation);
+    if (rotation != glm::vec3(0.0))
+    {
+        R = glm::mat4_cast(glm::quat(rotation));
+    }
+    S = glm::scale(S, scaling);
+
+    return std::make_pair(T * R * S, R);
 }
 
 Model Model::merge(std::vector<Model>& models)

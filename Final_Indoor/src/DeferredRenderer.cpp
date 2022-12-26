@@ -2,9 +2,8 @@
 
 #include <GLM/gtc/type_ptr.hpp>
 
-DeferredRenderer::DeferredRenderer(int na, glm::ivec2 ws)
+DeferredRenderer::DeferredRenderer(glm::ivec2 ws)
 {
-    numAttachment = na;
     updateWindowSize(ws);
     glEnable(GL_DEPTH_TEST);
 }
@@ -41,7 +40,7 @@ void DeferredRenderer::setupFrameBuffer()
     // Create fboDataTexture
     attachedTexs.clear();
     drawBuffers.clear();
-    for (int i = 0; i < numAttachment; ++i)
+    for (int i = 0; i < GBUFFER_COUNT; ++i)
     {
         attachNewFBTexture();
     }
@@ -72,6 +71,12 @@ void DeferredRenderer::genFBTexture(GLuint& tex, int attachment)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + attachment, GL_TEXTURE_2D, tex, 0);
+
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+    {
+        std::cout << "Error binding frame buffer: " << std::hex <<
+                glCheckFramebufferStatus(GL_FRAMEBUFFER) << std::endl;
+    }
 }
 
 void DeferredRenderer::updateWindowSize(glm::ivec2 ws)
@@ -79,6 +84,11 @@ void DeferredRenderer::updateWindowSize(glm::ivec2 ws)
     winSize = ws;
     glViewport(0, 0, ws.x, ws.y);
     setupFrameBuffer();
+}
+
+void DeferredRenderer::appendSceneObj(Model* model)
+{
+    sceneObjects.push_back(model);
 }
 
 int DeferredRenderer::attachNewFBTexture()
@@ -126,7 +136,16 @@ void DeferredRenderer::translateCamera(glm::vec3 amount)
     camCenter += amount;
 }
 
-void DeferredRenderer::prepareFirstStage()
+
+void DeferredRenderer::shadowMapStage()
+{
+    dirShadowMapper->beforeRender();
+    clear();
+    dirShadowMapper->renderShadowMap(sceneObjects);
+    glViewport(0, 0, winSize.x, winSize.y);
+}
+
+void DeferredRenderer::firstStage()
 {
     glBindFramebuffer(GL_FRAMEBUFFER, fbo);
     glDrawBuffers(attachedTexs.size(), drawBuffers.data());
@@ -134,6 +153,16 @@ void DeferredRenderer::prepareFirstStage()
     fbufSP->useProgram();
     glUniformMatrix4fv((*fbufSP)["projMat"], 1, false, glm::value_ptr(this->projMat));
     glUniformMatrix4fv((*fbufSP)["viewMat"], 1, false, glm::value_ptr(this->viewMat));
+
+    glm::mat4 shadowSbpv = dirShadowMapper->getShadowSBPVMat();
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, dirShadowMapper->depthTex);
+    glUniform1i((*fbufSP)["shadowTex"], 1);
+    
+    for (auto model : sceneObjects)
+    {
+        model->render(fbufSP, shadowSbpv);
+    }
 }
 
 void DeferredRenderer::secondStage()

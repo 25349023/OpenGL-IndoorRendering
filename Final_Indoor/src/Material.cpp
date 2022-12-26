@@ -3,7 +3,6 @@
 #include <cstring>
 #define STB_IMAGE_IMPLEMENTATION
 #include <iostream>
-#include <ostream>
 
 #include "stb_image.h"
 

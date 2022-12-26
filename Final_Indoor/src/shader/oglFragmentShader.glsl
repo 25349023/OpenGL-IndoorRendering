@@ -3,6 +3,7 @@
 in vec3 f_worldVertex;
 in vec3 f_worldNormal;
 in vec3 f_uv;
+in vec4 f_shadowCoord;
 
 layout (location = 0) out vec4 fragColor;
 layout (location = 1) out vec4 worldSpaceVertex;
@@ -11,6 +12,7 @@ layout (location = 3) out vec4 ambientColorMap;
 layout (location = 4) out vec4 diffuseColorMap;
 layout (location = 5) out vec4 specularColorMap;
 layout (location = 6) out vec4 shininessMap;
+layout (location = 7) out vec4 shadowMap;
 
 uniform int pixelProcessId;
 uniform sampler2D albedoTex;
@@ -21,6 +23,8 @@ uniform vec3 ka;
 uniform vec3 kd;
 uniform vec3 ks;
 uniform float ns;
+
+uniform sampler2DShadow shadowTex;
 
 uniform vec3 lightAmbient = vec3(0.1);
 uniform vec3 lightDiffuse = vec3(0.7);
@@ -56,4 +60,5 @@ void main() {
     diffuseColorMap = diffuse_color();
     specularColorMap = vec4(ks, 1.0);
     shininessMap = vec4(ns);
+    shadowMap = vec4(vec3(textureProj(shadowTex, f_shadowCoord)), 1.0);
 }
