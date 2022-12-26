@@ -122,25 +122,8 @@ int main()
 
 void gameLoop(GLFWwindow* window)
 {
-    double previousTimeForFPS = glfwGetTime();
-    int frameCount = 0;
-
     while (!glfwWindowShouldClose(window))
     {
-        // measure speed
-        const double currentTime = glfwGetTime();
-        frameCount = frameCount + 1;
-        const double deltaTime = currentTime - previousTimeForFPS;
-        if (deltaTime >= 1.0)
-        {
-            m_imguiPanel->setAvgFPS(frameCount * 1.0);
-            m_imguiPanel->setAvgFrameTime(deltaTime * 1000.0 / frameCount);
-
-            // reset
-            frameCount = 0;
-            previousTimeForFPS = currentTime;
-        }
-
         glfwPollEvents();
         paintGL();
         glfwSwapBuffers(window);
