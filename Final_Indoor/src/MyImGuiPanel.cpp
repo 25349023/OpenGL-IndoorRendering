@@ -43,12 +43,13 @@ void MyImGuiPanel::update()
         ImGui::SameLine();
         ImGui::RadioButton("Specular Color", atexPtr, SPECULAR_COLOR);
     }
-    
-    if (ImGui::CollapsingHeader("Directional Light"))
+
+    auto enable = deferredRenderer->enableFeature.data();
+    if (ImGui::CollapsingHeader("Blinn-Phong Shading"))
     {
-        ImGui::DragFloat3("Direction", glm::value_ptr(deferredRenderer->dirLight), 0.2);
+        ImGui::Checkbox("Enable", enable + BLINN_PHONG_SHADING);
+        ImGui::DragFloat3("Light Position", glm::value_ptr(deferredRenderer->nearDirLight), 0.2);
     }
-    
 }
 
 void MyImGuiPanel::setAvgFPS(const double avgFPS)

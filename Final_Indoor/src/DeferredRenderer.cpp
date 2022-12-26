@@ -47,6 +47,8 @@ void DeferredRenderer::setupFrameBuffer()
     }
     activeTex = FRAG_COLOR;
 
+    enableFeature.fill(true);
+
     // Create Depth RBO
     glGenRenderbuffers(1, &depthRbo);
     glBindRenderbuffer(GL_RENDERBUFFER, depthRbo);
@@ -89,7 +91,8 @@ int DeferredRenderer::attachNewFBTexture()
     return idx;
 }
 
-void DeferredRenderer::rotateCamera(const float rad) {
+void DeferredRenderer::rotateCamera(const float rad)
+{
     glm::mat4 vt = glm::transpose(viewMat);
     glm::vec4 yAxisVec4 = vt[1];
     glm::vec3 yAxis(yAxisVec4.x, yAxisVec4.y, yAxisVec4.z);
@@ -110,7 +113,6 @@ void DeferredRenderer::recalculateCameraLocals()
 
     glm::vec3 side = glm::cross(camLocalZ, camUp);
     camLocalY = glm::normalize(glm::cross(side, camLocalZ));
-
 }
 
 void DeferredRenderer::updateViewMat()
@@ -143,7 +145,14 @@ void DeferredRenderer::secondStage()
     glBindVertexArray(frameVao);
     glUniform1i((*screenSP)["activeTex"], activeTex);
     glUniform3fv((*screenSP)["cameraEye"], 1, glm::value_ptr(camEye));
-    glUniform3fv((*screenSP)["directionalLight"], 1, glm::value_ptr(dirLight));
+    glUniform3fv((*screenSP)["directionalLight"], 1, glm::value_ptr(nearDirLight));
+
+    for (int i = 0; i < FEATURE_COUNT; ++i)
+    {
+        char uniformName[24];
+        sprintf(uniformName, "enableFeature[%d]", i);
+        glUniform1i((*screenSP)[uniformName], enableFeature[i]);
+    }
 
     for (int i = 0; i < GBUFFER_COUNT; ++i)
     {

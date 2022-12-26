@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <vector>
 #include <glad/glad.h>
 
@@ -19,6 +20,8 @@ enum GBuffer
     SHININESS,
     GBUFFER_COUNT
 };
+
+enum Feature { BLINN_PHONG_SHADING, FEATURE_COUNT };
 
 class DeferredRenderer
 {
@@ -63,7 +66,9 @@ private:
     std::vector<GLuint> attachedTexs{};
     std::vector<GLenum> drawBuffers{};
     GLuint activeTex{};
-    glm::vec3 dirLight{ -2.845, 2.028, -1.293 };
+    glm::vec3 nearDirLight{ -2.845, 2.028, -1.293 };
+
+    std::array<bool, FEATURE_COUNT> enableFeature{};
 
     glm::ivec2 winSize{};
 

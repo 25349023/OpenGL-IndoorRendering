@@ -8,6 +8,8 @@ uniform int activeTex;
 uniform vec3 cameraEye;
 uniform vec3 directionalLight;
 
+uniform bool enableFeature[1];
+
 uniform vec3 Ia = vec3(0.1);
 uniform vec3 Id = vec3(0.7);
 uniform vec3 Is = vec3(0.2);
@@ -30,7 +32,7 @@ vec4 blinn_phong_shading() {
     
     vec3 V = check_normalize(cameraEye - worldVertex);
     vec3 N = normalize(worldNormal);
-    vec3 L = normalize(directionalLight);
+    vec3 L = normalize(directionalLight - worldVertex);
     vec3 H = normalize(L + V);
 
     vec3 ka = texture(tex[3], fs_in.texcoord).xyz;
@@ -47,7 +49,13 @@ vec4 blinn_phong_shading() {
 
 void main(void) {
     if (activeTex == 0) {
-        fragColor = blinn_phong_shading();
+        vec4 color = vec4(1.0);
+        color = texture(tex[4], fs_in.texcoord);
+        if (enableFeature[0]) {
+            color = blinn_phong_shading();
+        }
+        
+        fragColor = color;
     }
     else if (activeTex == 1 || activeTex == 2) {
         vec3 texel = texture(tex[activeTex], fs_in.texcoord).xyz; 
