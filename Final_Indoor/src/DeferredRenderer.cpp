@@ -144,8 +144,6 @@ void DeferredRenderer::shadowMapStage()
     clear();
     dirShadowMapper->renderShadowMap(sceneObjects);
     glViewport(0, 0, winSize.x, winSize.y);
-    glCullFace(GL_BACK);
-    glDisable(GL_CULL_FACE);
 }
 
 void DeferredRenderer::firstStage()

@@ -51,8 +51,6 @@ void DirectionalShadowMapper::beforeRender()
     glViewport(0, 0, shadowMapRes, shadowMapRes);
     depthSP->useProgram();
 
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_FRONT);
     updateLightVPMat();
 }
 
