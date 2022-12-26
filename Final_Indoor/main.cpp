@@ -336,7 +336,7 @@ void resize(const int w, const int h)
 
     const double PLAYER_PROJ_FAR = 150.0;
 
-    deferredRenderer->projMat = glm::perspective(glm::radians(45.0), w * 1.0 / h, 0.1, PLAYER_PROJ_FAR);
+    deferredRenderer->projMat = glm::perspective(glm::radians(60.0), w * 1.0 / h, 0.1, PLAYER_PROJ_FAR);
 
     deferredRenderer->updateWindowSize(glm::ivec2(w, h));
 }

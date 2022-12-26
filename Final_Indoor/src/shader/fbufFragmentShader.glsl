@@ -49,7 +49,7 @@ vec4 blinn_phong_shading() {
         shadow = texture(tex[7], fs_in.texcoord).x;
     }
     
-    return vec4(shadow * (ambient + diffuse + specular), 1.0);
+    return vec4(ambient + shadow * (diffuse + specular), 1.0);
 }
 
 void main(void) {

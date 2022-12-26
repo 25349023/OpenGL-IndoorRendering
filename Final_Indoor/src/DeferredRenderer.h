@@ -52,8 +52,8 @@ public:
 
     friend class MyImGuiPanel;
 
-    glm::vec3 camEye{ 4.6, 1.2, -2.0 };
-    glm::vec3 camCenter{ 4.5, 1.2, -2.0 };
+    glm::vec3 camEye{ 4.0, 1.0, -1.5 };
+    glm::vec3 camCenter{ 3.0, 1.0, -1.5 };
     glm::vec3 camUp{ 0.0, 1.0, 0.0 };
     glm::vec3 camLocalY{ 0, 1, 0 };
     glm::vec3 camLocalZ{ 0, 0, -1 };
@@ -78,7 +78,6 @@ private:
     std::vector<GLuint> attachedTexs{};
     std::vector<GLenum> drawBuffers{};
     GLuint activeTex{};
-    glm::vec3 nearDirLight{ -2.845, 2.028, -1.293 };
 
     std::array<bool, FEATURE_COUNT> enableFeature{};
 

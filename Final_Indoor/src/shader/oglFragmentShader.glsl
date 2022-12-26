@@ -16,15 +16,14 @@ layout (location = 7) out vec4 shadowMap;
 
 uniform int pixelProcessId;
 uniform sampler2D albedoTex;
-
-uniform bool effectsToggle[1];
+uniform vec3 directionalLight;
 
 uniform vec3 ka;
 uniform vec3 kd;
 uniform vec3 ks;
 uniform float ns;
 
-uniform sampler2DShadow shadowTex;
+uniform sampler2D shadowTex;
 
 uniform vec3 lightAmbient = vec3(0.1);
 uniform vec3 lightDiffuse = vec3(0.7);
@@ -60,5 +59,9 @@ void main() {
     diffuseColorMap = diffuse_color();
     specularColorMap = vec4(ks, 1.0);
     shininessMap = vec4(ns);
-    shadowMap = vec4(vec3(textureProj(shadowTex, f_shadowCoord)), 1.0);
+    
+    float lightSpaceDepth = texture(shadowTex, f_shadowCoord.xy).r;
+    float bias = min(0.03, max(0.03 * (1.0 - dot(f_worldNormal, directionalLight)), 0.005));  
+    float shadow = f_shadowCoord.z - bias <= lightSpaceDepth ? 1.0 : 0.0;
+    shadowMap = vec4(vec3(shadow), 1.0);
 }

@@ -6,6 +6,7 @@ DeferredRenderer::DeferredRenderer(glm::ivec2 ws)
 {
     updateWindowSize(ws);
     glEnable(GL_DEPTH_TEST);
+    recalculateCameraLocals();
 }
 
 void DeferredRenderer::setupFrameBuffer()
@@ -17,10 +18,10 @@ void DeferredRenderer::setupFrameBuffer()
     const float windowVertex[] =
     {
         //vec2 position vec2 texture_coord
-        1.0f, -1.0f, 1.0f, 0.0f,
-        -1.0f, -1.0f, 0.0f, 0.0f,
+        1.0f, 1.0f, 1.0f, 1.0f,
         -1.0f, 1.0f, 0.0f, 1.0f,
-        1.0f, 1.0f, 1.0f, 1.0f
+        -1.0f, -1.0f, 0.0f, 0.0f,
+        1.0f, -1.0f, 1.0f, 0.0f
     };
 
     glGenBuffers(1, &windowVbo);
@@ -143,6 +144,8 @@ void DeferredRenderer::shadowMapStage()
     clear();
     dirShadowMapper->renderShadowMap(sceneObjects);
     glViewport(0, 0, winSize.x, winSize.y);
+    glCullFace(GL_BACK);
+    glDisable(GL_CULL_FACE);
 }
 
 void DeferredRenderer::firstStage()
@@ -158,7 +161,9 @@ void DeferredRenderer::firstStage()
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, dirShadowMapper->depthTex);
     glUniform1i((*fbufSP)["shadowTex"], 1);
-    
+    glUniform3fv((*fbufSP)["directionalLight"], 1,
+        glm::value_ptr(dirShadowMapper->lightEye - dirShadowMapper->lightLookAt));
+
     for (auto model : sceneObjects)
     {
         model->render(fbufSP, shadowSbpv);
@@ -174,7 +179,7 @@ void DeferredRenderer::secondStage()
     glBindVertexArray(frameVao);
     glUniform1i((*screenSP)["activeTex"], activeTex);
     glUniform3fv((*screenSP)["cameraEye"], 1, glm::value_ptr(camEye));
-    glUniform3fv((*screenSP)["directionalLight"], 1, glm::value_ptr(nearDirLight));
+    glUniform3fv((*screenSP)["directionalLight"], 1, glm::value_ptr(dirShadowMapper->lightEye));
 
     for (int i = 0; i < FEATURE_COUNT; ++i)
     {

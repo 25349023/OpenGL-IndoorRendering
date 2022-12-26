@@ -28,7 +28,7 @@ void DirectionalShadowMapper::setupDepthFrameBuffer()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
 
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthTex, 0);
+    glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, depthTex, 0);
 
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
     {
@@ -42,7 +42,7 @@ void DirectionalShadowMapper::setupDepthFrameBuffer()
 void DirectionalShadowMapper::updateLightVPMat()
 {
     lightViewMat = glm::lookAt(lightEye, lightLookAt, glm::vec3(0.0, 1.0, 0.0));
-    lightProjMat = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, 0.0f, 100.0f);
+    lightProjMat = glm::ortho(-8.0f, 8.0f, -8.0f, 8.0f, 0.0f, 15.0f);
 }
 
 void DirectionalShadowMapper::beforeRender()
@@ -50,8 +50,10 @@ void DirectionalShadowMapper::beforeRender()
     glBindFramebuffer(GL_FRAMEBUFFER, depthFbo);
     glViewport(0, 0, shadowMapRes, shadowMapRes);
     depthSP->useProgram();
-    glEnable(GL_POLYGON_OFFSET_FILL);
-    glPolygonOffset(4, 4);
+
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_FRONT);
+    updateLightVPMat();
 }
 
 void DirectionalShadowMapper::renderShadowMap(const std::vector<Model*>& sceneObjs)
@@ -72,8 +74,6 @@ void DirectionalShadowMapper::renderShadowMap(const std::vector<Model*>& sceneOb
             glBindVertexArray(0);
         }
     }
-
-    glDisable(GL_POLYGON_OFFSET_FILL);
 }
 
 glm::mat4 DirectionalShadowMapper::getShadowSBPVMat()

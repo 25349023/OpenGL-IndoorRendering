@@ -15,8 +15,6 @@ uniform mat4 modelMat;
 uniform mat4 modelRotateMat;
 uniform mat4 shadowMat;
 
-uniform vec3 directionalLight = vec3(-2.845, 2.028, -1.293);
-
 vec3 check_normalize(vec3 v) {
     if (v == vec3(0.0)) {
         return v;
