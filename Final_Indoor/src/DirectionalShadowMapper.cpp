@@ -42,7 +42,7 @@ void DirectionalShadowMapper::setupDepthFrameBuffer()
 void DirectionalShadowMapper::updateLightVPMat()
 {
     lightViewMat = glm::lookAt(lightEye, lightLookAt, glm::vec3(0.0, 1.0, 0.0));
-    lightProjMat = glm::ortho(-8.0f, 8.0f, -8.0f, 8.0f, 0.0f, 15.0f);
+    lightProjMat = glm::ortho(-5.0f, 5.0f, -5.0f, 5.0f, 0.1f, 10.0f);
 }
 
 void DirectionalShadowMapper::beforeRender()

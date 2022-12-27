@@ -72,6 +72,7 @@
     <Content Include="assets\indoor\models\textures\smirnoffcap_label.png" />
     <Content Include="assets\indoor\models\textures\smirnoff_label.png" />
     <Content Include="assets\indoor\models\textures\WoodFine0036_L.jpg" />
+    <Content Include="assets\indoor\Sphere.obj" />
     <Content Include="assets\indoor\trice.mtl" />
     <Content Include="assets\indoor\trice.obj" />
     <Content Include="assets\indoor\tricnorm.jpg" />

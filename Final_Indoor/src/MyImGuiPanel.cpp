@@ -39,13 +39,27 @@ void MyImGuiPanel::update()
     auto enable = deferredRenderer->enableFeature.data();
     if (ImGui::CollapsingHeader("Blinn-Phong Shading"))
     {
+        ImGui::PushID("Directional");
         ImGui::DragFloat3("Light Position",
             glm::value_ptr(deferredRenderer->dirShadowMapper->lightEye), 0.1f);
         ImGui::DragFloat3("Light LookAt",
             glm::value_ptr(deferredRenderer->dirShadowMapper->lightLookAt), 0.1f);
         ImGui::Checkbox("Enable Lighting", enable + BLINN_PHONG_SHADING);
         ImGui::Checkbox("Enable Directional Shadow Mapping", enable + DIR_SHADOW_MAPPING);
+        ImGui::PopID();
     }
     
     ImGui::Checkbox("Enable Normal Mapping", enable + NORMAL_MAPPING);
+    
+    if (ImGui::CollapsingHeader("Point Light"))
+    {
+        ImGui::PushID("Point");
+        ImGui::DragFloat3("Light Position",
+            glm::value_ptr(deferredRenderer->pointLightPos), 0.1f);
+        ImGui::DragFloat3("Attenuation Setting",
+            glm::value_ptr(deferredRenderer->pointLightAttenuation), 0.1f);
+        ImGui::Checkbox("Enable Point Light Effect", enable + POINT_LIGHT);
+        ImGui::PopID();
+    }
+
 }

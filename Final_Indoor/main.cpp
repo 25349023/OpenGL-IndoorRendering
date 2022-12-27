@@ -17,7 +17,7 @@
 #include "src/Model.h"
 
 #pragma comment (lib, "lib-vc2015\\glfw3.lib")
-#pragma comment(lib, "assimp-vc141-mt.lib")
+#pragma comment (lib, "assimp-vc141-mt.lib")
 
 int FRAME_WIDTH = 960;
 int FRAME_HEIGHT = 640;
@@ -41,10 +41,7 @@ glm::vec3 rotateCenterAccordingToEye(const glm::vec3& center, const glm::vec3& e
 bool leftButtonPressed = false;
 bool rightButtonPressed = false;
 
-glm::vec2 lastCursorPos;
-
 MyImGuiPanel* m_imguiPanel = nullptr;
-
 
 // ==============================================
 DeferredRenderer* deferredRenderer = nullptr;

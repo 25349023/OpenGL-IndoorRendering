@@ -179,6 +179,9 @@ void DeferredRenderer::secondStage()
     glUniform3fv((*screenSP)["cameraEye"], 1, glm::value_ptr(camEye));
     glUniform3fv((*screenSP)["directionalLight"], 1, glm::value_ptr(dirShadowMapper->lightEye));
 
+    glUniform3fv((*screenSP)["pointLight"], 1, glm::value_ptr(pointLightPos));
+    glUniform3fv((*screenSP)["pointLightAttenuation"], 1, glm::value_ptr(pointLightAttenuation));
+
     for (int i = 0; i < FEATURE_COUNT; ++i)
     {
         char uniformName[24];

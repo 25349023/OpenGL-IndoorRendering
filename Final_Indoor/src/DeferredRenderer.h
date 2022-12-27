@@ -28,6 +28,7 @@ enum Feature
     BLINN_PHONG_SHADING,
     DIR_SHADOW_MAPPING,
     NORMAL_MAPPING,
+    POINT_LIGHT,
     FEATURE_COUNT
 };
 
@@ -83,6 +84,9 @@ private:
     std::array<bool, FEATURE_COUNT> enableFeature{};
 
     glm::ivec2 winSize{};
+
+    glm::vec3 pointLightPos{ 1.87659, 0.4625, 0.103928 };
+    glm::vec3 pointLightAttenuation{ 1.0, 0.7, 0.14 };
 
     int attachNewFBTexture();
     void setupFrameBuffer();
