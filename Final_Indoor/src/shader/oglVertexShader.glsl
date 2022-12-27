@@ -3,11 +3,14 @@
 layout (location = 0) in vec3 v_vertex;
 layout (location = 1) in vec3 v_normal;
 layout (location = 2) in vec3 v_uv;
+layout (location = 3) in vec3 v_tangent;
+layout (location = 4) in vec3 v_bitangent;
 
 out vec3 f_worldVertex;
 out vec3 f_worldNormal;
 out vec3 f_uv;
 out vec4 f_shadowCoord;
+out mat3 f_TBN;
 
 uniform mat4 projMat;
 uniform mat4 viewMat;
@@ -32,6 +35,11 @@ void commonProcess() {
     f_uv = v_uv;
     f_shadowCoord = shadowMat * vec4(v_vertex, 1.0);
 
+    vec3 T = normalize(mat3(modelRotateMat) * v_tangent);
+    vec3 B = normalize(mat3(modelRotateMat) * v_bitangent);
+    vec3 N = normalize(f_worldNormal);
+    f_TBN = mat3(T, B, N);
+    
     gl_Position = projMat * viewVertex;
 }
 

@@ -4,6 +4,7 @@ in vec3 f_worldVertex;
 in vec3 f_worldNormal;
 in vec3 f_uv;
 in vec4 f_shadowCoord;
+in mat3 f_TBN;
 
 layout (location = 0) out vec4 fragColor;
 layout (location = 1) out vec4 worldSpaceVertex;
@@ -16,7 +17,9 @@ layout (location = 7) out vec4 shadowMap;
 
 uniform int pixelProcessId;
 uniform sampler2D albedoTex;
+uniform sampler2D normalTex;
 uniform vec3 directionalLight;
+uniform bool hasNorm;
 
 uniform vec3 ka;
 uniform vec3 kd;
@@ -54,7 +57,13 @@ void main() {
     fragColor = diffuse_color();    
 
     worldSpaceVertex = vec4(f_worldVertex, 1.0);
+
     worldSpaceNormal = vec4(f_worldNormal, 1.0);
+    if (hasNorm) {
+        vec3 normal = texture(normalTex, f_uv.xy).rgb * 2.0 - 1.0;
+        worldSpaceNormal = vec4(normalize(f_TBN * normal), 1.0);
+    }
+    
     ambientColorMap = vec4(ka, 1.0);
     diffuseColorMap = diffuse_color();
     specularColorMap = vec4(ks, 1.0);

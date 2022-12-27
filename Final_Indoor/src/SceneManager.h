@@ -7,8 +7,8 @@
 class SceneManager
 {
 private:
-    SceneManager(): m_vertexHandle(0), m_normalHandle(1), m_uvHandle(2),
-    m_fs_commonProcess(0), m_fs_textureMapping(1), m_fs_simpleShading(2) {}
+    SceneManager(): m_vertexHandle(0), m_normalHandle(1), m_uvHandle(2), m_tangentHandle(3), m_bitangentHandle(4),
+                    m_fs_commonProcess(0), m_fs_textureMapping(1), m_fs_simpleShading(2) {}
 
 
 public:
@@ -27,6 +27,8 @@ public:
     GLuint m_vertexHandle;
     GLuint m_normalHandle;
     GLuint m_uvHandle;
+    GLuint m_tangentHandle;
+    GLuint m_bitangentHandle;
 
     int m_fs_commonProcess;
     int m_fs_textureMapping;

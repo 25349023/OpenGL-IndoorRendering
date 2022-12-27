@@ -65,6 +65,17 @@ void Model::loadMaterials(const char* asset_root)
             material.bindTexture(full_path);
         }
 
+        if (aiMaterial->GetTexture(aiTextureType_HEIGHT, 0, &texturePath) == aiReturn_SUCCESS)
+        {
+            char full_path[96] = "";
+            strncpy(full_path, asset_root, 45);
+            strncat(full_path, texturePath.C_Str(), 45);
+            std::cout << "Loading normal maps: " << full_path << std::endl;
+
+            material.bindTexture(full_path, true);
+            
+        }
+
         materials.push_back(material);
     }
 }
@@ -81,8 +92,8 @@ void Model::render(ShaderProgram* shaderProgram, glm::mat4 shadowSbpvMat)
     auto sm = SceneManager::Instance();
     auto& sp = *shaderProgram;
 
-    glActiveTexture(GL_TEXTURE0);
     glUniform1i(sp["albedoTex"], 0);
+    glUniform1i(sp["normalTex"], 2);
 
     auto mMat = getModelMat();
     glUniformMatrix4fv(sp["modelMat"], 1, false, glm::value_ptr(mMat.first));
@@ -112,8 +123,17 @@ void Model::render(ShaderProgram* shaderProgram, glm::mat4 shadowSbpvMat)
 
         if (material.hasTex)
         {
+            glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, material.diffuseTex);
         }
+        
+        glUniform1i(sp["hasNorm"], material.hasNorm);
+        if (material.hasNorm)
+        {
+            glActiveTexture(GL_TEXTURE2);
+            glBindTexture(GL_TEXTURE_2D, material.normalTex);
+        }
+        
         glDrawElements(GL_TRIANGLES, shape.drawCount, GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
     }

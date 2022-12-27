@@ -30,19 +30,29 @@ void Material::extractColorCoef(aiMaterial* aiMaterial)
 
     aiMaterial->Get(AI_MATKEY_COLOR_DIFFUSE, color);
     diffuse = glm::vec3(color.r, color.g, color.b);
-    
+
     aiMaterial->Get(AI_MATKEY_COLOR_SPECULAR, color);
     specular = glm::vec3(color.r, color.g, color.b);
-    
+
     aiMaterial->Get(AI_MATKEY_SHININESS, shininess);
 }
 
-void Material::bindTexture(const char* path)
+void Material::bindTexture(const char* path, bool isNormalMap)
 {
     texture = loadImg(path);
 
-    glGenTextures(1, &diffuseTex);
-    glBindTexture(GL_TEXTURE_2D, diffuseTex);
+    if (isNormalMap)
+    {
+        glGenTextures(1, &normalTex);
+        glBindTexture(GL_TEXTURE_2D, normalTex);
+        hasNorm = true;
+    }
+    else
+    {
+        glGenTextures(1, &diffuseTex);
+        glBindTexture(GL_TEXTURE_2D, diffuseTex);
+        hasTex = true;
+    }
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, texture.width, texture.height, 0,
         GL_RGBA, GL_UNSIGNED_BYTE, texture.data);
     glGenerateMipmap(GL_TEXTURE_2D);
@@ -51,6 +61,4 @@ void Material::bindTexture(const char* path)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    hasTex = true;
 }

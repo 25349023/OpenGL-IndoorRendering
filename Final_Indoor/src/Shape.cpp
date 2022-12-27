@@ -1,5 +1,7 @@
 ﻿#include "Shape.h"
 
+#include <iostream>
+
 #include "SceneManager.h"
 
 void Shape::extractMeshData(const aiMesh* mesh)
@@ -13,6 +15,11 @@ void Shape::extractMeshData(const aiMesh* mesh)
         {
             vertex.texCoords = glm::vec3(mesh->mTextureCoords[0][v].x, mesh->mTextureCoords[0][v].y, 0.0);
         }
+        if (mesh->HasTangentsAndBitangents())
+        {
+            vertex.tangent = glm::vec3(mesh->mTangents[v].x, mesh->mTangents[v].y, mesh->mTangents[v].z);
+            vertex.bitangent = glm::vec3(mesh->mBitangents[v].x, mesh->mBitangents[v].y, mesh->mBitangents[v].z);
+        }
         vertices.push_back(vertex);
     }
 }
@@ -25,7 +32,7 @@ void Shape::extractMeshIndices(const aiMesh* mesh)
         {
             continue;
         }
-        
+
         unsigned int* idx = mesh->mFaces[f].mIndices;
         indices.insert(indices.end(), idx, idx + 3);
     }
@@ -45,10 +52,14 @@ void Shape::bindBuffers()
     glVertexAttribPointer(sm->m_vertexHandle, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
     glVertexAttribPointer(sm->m_normalHandle, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
     glVertexAttribPointer(sm->m_uvHandle, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texCoords));
+    glVertexAttribPointer(sm->m_tangentHandle, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, tangent));
+    glVertexAttribPointer(sm->m_bitangentHandle, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, bitangent));
 
     glEnableVertexAttribArray(sm->m_vertexHandle);
     glEnableVertexAttribArray(sm->m_normalHandle);
     glEnableVertexAttribArray(sm->m_uvHandle);
+    glEnableVertexAttribArray(sm->m_tangentHandle);
+    glEnableVertexAttribArray(sm->m_bitangentHandle);
 
     // index buffer
     glGenBuffers(1, &ibo);
@@ -57,4 +68,3 @@ void Shape::bindBuffers()
 
     glBindVertexArray(0);
 }
-

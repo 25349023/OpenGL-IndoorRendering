@@ -20,6 +20,7 @@ struct Material
 {
     texture_data texture;
     GLuint diffuseTex{};
+    GLuint normalTex{};
 
     glm::vec3 ambient{};
     glm::vec3 diffuse{};
@@ -27,9 +28,10 @@ struct Material
     float shininess{};
 
     bool hasTex{false};
+    bool hasNorm{false};
 
     Material() = default;
     
     void extractColorCoef(aiMaterial* aiMaterial);
-    void bindTexture(const char* path);
+    void bindTexture(const char* path, bool isNormalMap = false);
 };
