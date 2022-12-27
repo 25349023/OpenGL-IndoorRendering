@@ -45,7 +45,7 @@ void DeferredRenderer::setupFrameBuffer()
     {
         attachNewFBTexture();
     }
-    activeTex = FRAG_COLOR;
+    activeTex = RENDER_RESULT;
 
     enableFeature.fill(true);
 
@@ -149,22 +149,19 @@ void DeferredRenderer::shadowMapStage()
 void DeferredRenderer::firstStage()
 {
     glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-    glDrawBuffers(attachedTexs.size(), drawBuffers.data());
+    glDrawBuffers(attachedTexs.size() - 1, drawBuffers.data() + 1);
     clear();
     fbufSP->useProgram();
+
     glUniformMatrix4fv((*fbufSP)["projMat"], 1, false, glm::value_ptr(this->projMat));
     glUniformMatrix4fv((*fbufSP)["viewMat"], 1, false, glm::value_ptr(this->viewMat));
 
-    glm::mat4 shadowSbpv = dirShadowMapper->getShadowSBPVMat();
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, dirShadowMapper->depthTex);
-    glUniform1i((*fbufSP)["shadowTex"], 1);
     glUniform3fv((*fbufSP)["directionalLight"], 1,
         glm::value_ptr(dirShadowMapper->lightEye - dirShadowMapper->lightLookAt));
 
     for (auto model : sceneObjects)
     {
-        model->render(fbufSP, shadowSbpv, enableFeature[NORMAL_MAPPING]);
+        model->render(fbufSP, enableFeature[NORMAL_MAPPING]);
     }
 }
 
@@ -178,6 +175,13 @@ void DeferredRenderer::secondStage()
     glUniform1i((*screenSP)["activeTex"], activeTex);
     glUniform3fv((*screenSP)["cameraEye"], 1, glm::value_ptr(camEye));
     glUniform3fv((*screenSP)["directionalLight"], 1, glm::value_ptr(dirShadowMapper->lightEye));
+
+    glActiveTexture(GL_TEXTURE11);
+    glBindTexture(GL_TEXTURE_2D, dirShadowMapper->depthTex);
+    glUniform1i((*screenSP)["shadowTex"], 11);
+    
+    glUniformMatrix4fv((*screenSP)["shadowMat"], 1, false,
+        glm::value_ptr(dirShadowMapper->getShadowSBPVMat()));
 
     glUniform3fv((*screenSP)["pointLight"], 1, glm::value_ptr(pointLightPos));
     glUniform3fv((*screenSP)["pointLightAttenuation"], 1, glm::value_ptr(pointLightAttenuation));

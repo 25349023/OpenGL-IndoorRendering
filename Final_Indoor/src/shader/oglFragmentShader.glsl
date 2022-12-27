@@ -3,17 +3,14 @@
 in vec3 f_worldVertex;
 in vec3 f_worldNormal;
 in vec3 f_uv;
-in vec4 f_shadowCoord;
 in mat3 f_TBN;
 
-layout (location = 0) out vec4 fragColor;
-layout (location = 1) out vec4 worldSpaceVertex;
-layout (location = 2) out vec4 worldSpaceNormal;
-layout (location = 3) out vec4 ambientColorMap;
-layout (location = 4) out vec4 diffuseColorMap;
-layout (location = 5) out vec4 specularColorMap;
-layout (location = 6) out vec4 shininessMap;
-layout (location = 7) out vec4 shadowMap;
+layout (location = 0) out vec4 worldSpaceVertex;
+layout (location = 1) out vec4 worldSpaceNormal;
+layout (location = 2) out vec4 ambientColorMap;
+layout (location = 3) out vec4 diffuseColorMap;
+layout (location = 4) out vec4 specularColorMap;
+layout (location = 5) out vec4 shininessMap;
 
 uniform int pixelProcessId;
 uniform sampler2D albedoTex;
@@ -54,8 +51,6 @@ vec4 diffuse_color() {
 }
 
 void main() {
-    fragColor = diffuse_color();    
-
     worldSpaceVertex = vec4(f_worldVertex, 1.0);
 
     worldSpaceNormal = vec4(f_worldNormal, 1.0);
@@ -68,9 +63,4 @@ void main() {
     diffuseColorMap = diffuse_color();
     specularColorMap = vec4(ks, 1.0);
     shininessMap = vec4(ns);
-    
-    float lightSpaceDepth = texture(shadowTex, f_shadowCoord.xy).r;
-    float bias = min(0.03, max(0.03 * (1.0 - dot(f_worldNormal, directionalLight)), 0.005));  
-    float shadow = f_shadowCoord.z - bias <= lightSpaceDepth ? 1.0 : 0.0;
-    shadowMap = vec4(vec3(shadow), 1.0);
 }

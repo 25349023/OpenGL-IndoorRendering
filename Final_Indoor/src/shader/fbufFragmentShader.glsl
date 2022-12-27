@@ -1,12 +1,15 @@
 #version 430 core
 
-layout (location = 0) uniform sampler2D tex[8];
+layout (location = 0) uniform sampler2D tex[7];
 
 layout (location = 0) out vec4 fragColor;
 
 uniform int activeTex;
 uniform vec3 cameraEye;
 uniform vec3 directionalLight;
+
+uniform sampler2D shadowTex;
+uniform mat4 shadowMat;
 
 uniform vec3 pointLight;
 uniform vec3 pointLightAttenuation;
@@ -49,7 +52,11 @@ vec4 blinn_phong_shading() {
 
     float shadow = 1.0;
     if (enableFeature[1]) {
-        shadow = texture(tex[7], fs_in.texcoord).x;
+        vec4 f_shadowCoord = shadowMat * vec4(worldVertex, 1.0);
+        
+        float lightSpaceDepth = texture(shadowTex, f_shadowCoord.xy).x;
+        float bias = min(0.03, max(0.03 * (1.0 - dot(worldNormal, directionalLight)), 0.005));  
+        shadow = f_shadowCoord.z - bias <= lightSpaceDepth ? 1.0 : 0.0;
     }
 
     return vec4(ambient + shadow * (diffuse + specular), 1.0);

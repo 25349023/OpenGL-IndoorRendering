@@ -22,7 +22,7 @@ void MyImGuiPanel::update()
     {
         int* atexPtr = (int*)&deferredRenderer->activeTex;
 
-        ImGui::RadioButton("Render Result", atexPtr, FRAG_COLOR);
+        ImGui::RadioButton("Render Result", atexPtr, RENDER_RESULT);
         ImGui::SameLine();
         ImGui::RadioButton("World Vertex", atexPtr, WORLD_VERTEX);
         ImGui::SameLine();
@@ -33,7 +33,6 @@ void MyImGuiPanel::update()
         ImGui::RadioButton("Diffuse Color", atexPtr, DIFFUSE_COLOR);
         ImGui::SameLine();
         ImGui::RadioButton("Specular Color", atexPtr, SPECULAR_COLOR);
-        ImGui::RadioButton("Shadow Map", atexPtr, SHADOW_MAP);
     }
 
     auto enable = deferredRenderer->enableFeature.data();

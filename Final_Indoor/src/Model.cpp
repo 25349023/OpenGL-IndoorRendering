@@ -89,7 +89,7 @@ void Model::setTransform(glm::vec3 t, glm::vec3 r, glm::vec3 s)
     scaling = s;
 }
 
-void Model::render(ShaderProgram* shaderProgram, glm::mat4 shadowSbpvMat, bool normalMapEnabled)
+void Model::render(ShaderProgram* shaderProgram, bool normalMapEnabled)
 {
     auto sm = SceneManager::Instance();
     auto& sp = *shaderProgram;
@@ -100,9 +100,6 @@ void Model::render(ShaderProgram* shaderProgram, glm::mat4 shadowSbpvMat, bool n
     auto mMat = getModelMat();
     glUniformMatrix4fv(sp["modelMat"], 1, false, glm::value_ptr(mMat.first));
     glUniformMatrix4fv(sp["modelRotateMat"], 1, false, glm::value_ptr(mMat.second));
-
-    glm::mat4 shadowMat = shadowSbpvMat * mMat.first;
-    glUniformMatrix4fv(sp["shadowMat"], 1, false, glm::value_ptr(shadowMat));
 
     for (const auto& shape : shapes)
     {
