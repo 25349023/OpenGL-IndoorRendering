@@ -5,6 +5,8 @@
 #include <assimp/postprocess.h>
 #include <glm/gtx/quaternion.hpp>
 
+#include "DeferredRenderer.h"
+#include "DeferredRenderer.h"
 #include "SceneManager.h"
 
 
@@ -87,7 +89,7 @@ void Model::setTransform(glm::vec3 t, glm::vec3 r, glm::vec3 s)
     scaling = s;
 }
 
-void Model::render(ShaderProgram* shaderProgram, glm::mat4 shadowSbpvMat)
+void Model::render(ShaderProgram* shaderProgram, glm::mat4 shadowSbpvMat, bool normalMapEnabled)
 {
     auto sm = SceneManager::Instance();
     auto& sp = *shaderProgram;
@@ -127,7 +129,7 @@ void Model::render(ShaderProgram* shaderProgram, glm::mat4 shadowSbpvMat)
             glBindTexture(GL_TEXTURE_2D, material.diffuseTex);
         }
         
-        glUniform1i(sp["hasNorm"], material.hasNorm);
+        glUniform1i(sp["hasNorm"], material.hasNorm && normalMapEnabled);
         if (material.hasNorm)
         {
             glActiveTexture(GL_TEXTURE2);

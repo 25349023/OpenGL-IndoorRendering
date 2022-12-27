@@ -164,7 +164,7 @@ void DeferredRenderer::firstStage()
 
     for (auto model : sceneObjects)
     {
-        model->render(fbufSP, shadowSbpv);
+        model->render(fbufSP, shadowSbpv, enableFeature[NORMAL_MAPPING]);
     }
 }
 

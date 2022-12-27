@@ -46,4 +46,6 @@ void MyImGuiPanel::update()
         ImGui::Checkbox("Enable Lighting", enable + BLINN_PHONG_SHADING);
         ImGui::Checkbox("Enable Directional Shadow Mapping", enable + DIR_SHADOW_MAPPING);
     }
+    
+    ImGui::Checkbox("Enable Normal Mapping", enable + NORMAL_MAPPING);
 }

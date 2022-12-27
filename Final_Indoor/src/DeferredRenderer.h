@@ -27,6 +27,7 @@ enum Feature
 {
     BLINN_PHONG_SHADING,
     DIR_SHADOW_MAPPING,
+    NORMAL_MAPPING,
     FEATURE_COUNT
 };
 

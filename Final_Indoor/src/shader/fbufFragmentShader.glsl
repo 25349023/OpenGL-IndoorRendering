@@ -8,7 +8,7 @@ uniform int activeTex;
 uniform vec3 cameraEye;
 uniform vec3 directionalLight;
 
-uniform bool enableFeature[2];
+uniform bool enableFeature[3];
 
 uniform vec3 Ia = vec3(0.1);
 uniform vec3 Id = vec3(0.7);
