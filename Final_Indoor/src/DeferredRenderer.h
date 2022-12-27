@@ -92,7 +92,7 @@ private:
 
     glm::ivec2 winSize{};
 
-    int attachNewFBTexture();
+    void attachNewFBTexture();
     void setupFrameBuffer();
     void genFBTexture(GLuint& tex, int attachment);
 };

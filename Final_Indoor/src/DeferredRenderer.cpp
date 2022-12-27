@@ -97,14 +97,18 @@ void DeferredRenderer::appendSceneObj(Model* model)
     sceneObjects.push_back(model);
 }
 
-int DeferredRenderer::attachNewFBTexture()
+void DeferredRenderer::attachNewFBTexture()
 {
     attachedTexs.push_back(0);
     int idx = attachedTexs.size() - 1;
-    genFBTexture(attachedTexs[idx], idx);
-    drawBuffers.push_back(GL_COLOR_ATTACHMENT0 + idx);
+    if (idx == 0)
+    {
+        return;
+    }
 
-    return idx;
+    // - 1 to skip the RENDER_RESULT, be careful dealing with COLOR_ATTACHMENT 
+    genFBTexture(attachedTexs[idx], idx - 1);
+    drawBuffers.push_back(GL_COLOR_ATTACHMENT0 + idx - 1);
 }
 
 void DeferredRenderer::rotateCamera(const float rad)
@@ -154,7 +158,7 @@ void DeferredRenderer::shadowMapStage()
 void DeferredRenderer::firstStage()
 {
     glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-    glDrawBuffers(attachedTexs.size() - 1, drawBuffers.data() + 1);
+    glDrawBuffers(attachedTexs.size() - 1, drawBuffers.data());
     clear();
     fbufSP->useProgram();
 
@@ -203,7 +207,7 @@ void DeferredRenderer::secondStage()
         glUniform1i((*screenSP)[uniformName], enableFeature[i]);
     }
 
-    for (int i = 0; i < GBUFFER_COUNT; ++i)
+    for (int i = 1; i < GBUFFER_COUNT; ++i)
     {
         glUniform1i(i, i);
         glActiveTexture(GL_TEXTURE0 + i);
@@ -219,9 +223,9 @@ void DeferredRenderer::clear()
     static const float BLACK[] = { 0.0, 0.0, 0.0, 1.0 };
     static const float DEPTH[] = { 1.0 };
 
-    for (int i = 0; i < attachedTexs.size(); ++i)
+    for (int i = 1; i < attachedTexs.size(); ++i)
     {
-        glClearBufferfv(GL_COLOR, i, (i == EMISSION_MAP - 1) ? BLACK : COLOR);
+        glClearBufferfv(GL_COLOR, i - 1, (i == EMISSION_MAP) ? BLACK : COLOR);
     }
     glClearBufferfv(GL_DEPTH, 0, DEPTH);
 }
