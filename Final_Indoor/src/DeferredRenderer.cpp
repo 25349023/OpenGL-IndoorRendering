@@ -85,6 +85,11 @@ void DeferredRenderer::updateWindowSize(glm::ivec2 ws)
     winSize = ws;
     glViewport(0, 0, ws.x, ws.y);
     setupFrameBuffer();
+
+    if (gaussianBlurrer)
+    {
+        gaussianBlurrer->setupFrameBuffer(ws);
+    }
 }
 
 void DeferredRenderer::appendSceneObj(Model* model)
@@ -163,6 +168,11 @@ void DeferredRenderer::firstStage()
     {
         model->render(fbufSP, enableFeature[NORMAL_MAPPING]);
     }
+
+    if (enableFeature[BLOOM_EFFECT])
+    {
+        blurredTex = gaussianBlurrer->renderBlur(frameVao, attachedTexs[EMISSION_MAP]);
+    }
 }
 
 void DeferredRenderer::secondStage()
@@ -179,7 +189,7 @@ void DeferredRenderer::secondStage()
     glActiveTexture(GL_TEXTURE11);
     glBindTexture(GL_TEXTURE_2D, dirShadowMapper->depthTex);
     glUniform1i((*screenSP)["shadowTex"], 11);
-    
+
     glUniformMatrix4fv((*screenSP)["shadowMat"], 1, false,
         glm::value_ptr(dirShadowMapper->getShadowSBPVMat()));
 
@@ -197,7 +207,7 @@ void DeferredRenderer::secondStage()
     {
         glUniform1i(i, i);
         glActiveTexture(GL_TEXTURE0 + i);
-        glBindTexture(GL_TEXTURE_2D, attachedTexs[i]);
+        glBindTexture(GL_TEXTURE_2D, (i == EMISSION_MAP) ? blurredTex : attachedTexs[i]);
     }
     glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
     glBindVertexArray(0);
@@ -206,11 +216,12 @@ void DeferredRenderer::secondStage()
 void DeferredRenderer::clear()
 {
     static const float COLOR[] = { 0.1, 0.1, 0.1, 1.0 };
+    static const float BLACK[] = { 0.0, 0.0, 0.0, 1.0 };
     static const float DEPTH[] = { 1.0 };
 
     for (int i = 0; i < attachedTexs.size(); ++i)
     {
-        glClearBufferfv(GL_COLOR, i, COLOR);
+        glClearBufferfv(GL_COLOR, i, (i == EMISSION_MAP - 1) ? BLACK : COLOR);
     }
     glClearBufferfv(GL_DEPTH, 0, DEPTH);
 }

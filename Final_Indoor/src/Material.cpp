@@ -62,3 +62,9 @@ void Material::bindTexture(const char* path, bool isNormalMap)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 }
+
+void Material::setEmissive(glm::vec3 em)
+{
+    emission = em;
+    isEmissive = true;
+}

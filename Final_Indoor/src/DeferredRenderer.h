@@ -5,6 +5,7 @@
 #include <glad/glad.h>
 
 #include "DirectionalShadowMapper.h"
+#include "GaussianBlurrer.h"
 #include "Model.h"
 #include "Shader.h"
 #include "GLM/glm.hpp"
@@ -19,6 +20,7 @@ enum GBuffer
     DIFFUSE_COLOR,
     SPECULAR_COLOR,
     SHININESS,
+    EMISSION_MAP,
     GBUFFER_COUNT
 };
 
@@ -28,6 +30,7 @@ enum Feature
     DIR_SHADOW_MAPPING,
     NORMAL_MAPPING,
     POINT_LIGHT,
+    BLOOM_EFFECT,
     FEATURE_COUNT
 };
 
@@ -67,6 +70,10 @@ public:
     glm::mat4 viewMat{ 1.0 };
 
     DirectionalShadowMapper* dirShadowMapper{};
+    GaussianBlurrer* gaussianBlurrer{};
+
+    glm::vec3 pointLightPos{ 1.87659, 0.4625, 0.103928 };
+    glm::vec3 pointLightAttenuation{ 1.0, 0.7, 0.14 };
 
 private:
     GLuint frameVao{};
@@ -79,13 +86,11 @@ private:
     std::vector<GLuint> attachedTexs{};
     std::vector<GLenum> drawBuffers{};
     GLuint activeTex{};
+    GLuint blurredTex{};
 
     std::array<bool, FEATURE_COUNT> enableFeature{};
 
     glm::ivec2 winSize{};
-
-    glm::vec3 pointLightPos{ 1.87659, 0.4625, 0.103928 };
-    glm::vec3 pointLightAttenuation{ 1.0, 0.7, 0.14 };
 
     int attachNewFBTexture();
     void setupFrameBuffer();

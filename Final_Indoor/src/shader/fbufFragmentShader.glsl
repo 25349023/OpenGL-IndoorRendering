@@ -1,6 +1,6 @@
 #version 430 core
 
-layout (location = 0) uniform sampler2D tex[7];
+layout (location = 0) uniform sampler2D tex[8];
 
 layout (location = 0) out vec4 fragColor;
 
@@ -14,7 +14,7 @@ uniform mat4 shadowMat;
 uniform vec3 pointLight;
 uniform vec3 pointLightAttenuation;
 
-uniform bool enableFeature[4];
+uniform bool enableFeature[5];
 
 uniform vec3 Ia = vec3(0.1);
 uniform vec3 Id = vec3(0.7);
@@ -32,7 +32,7 @@ vec3 check_normalize(vec3 v) {
     return normalize(v);
 }
 
-vec4 blinn_phong_shading() {
+vec3 blinn_phong_shading() {
     vec3 worldVertex = texture(tex[1], fs_in.texcoord).xyz;
     vec3 worldNormal = texture(tex[2], fs_in.texcoord).xyz;
 
@@ -59,10 +59,10 @@ vec4 blinn_phong_shading() {
         shadow = f_shadowCoord.z - bias <= lightSpaceDepth ? 1.0 : 0.0;
     }
 
-    return vec4(ambient + shadow * (diffuse + specular), 1.0);
+    return ambient + shadow * (diffuse + specular);
 }
 
-vec4 point_light() {
+vec3 point_light() {
     vec3 worldVertex = texture(tex[1], fs_in.texcoord).xyz;
     vec3 worldNormal = texture(tex[2], fs_in.texcoord).xyz;
 
@@ -84,15 +84,20 @@ vec4 point_light() {
     float attenuation = 1.0 / (pointLightAttenuation.x + pointLightAttenuation.y * dis +
     pointLightAttenuation.z * (dis * dis));
 
-    return vec4(attenuation * (ambient + diffuse + specular), 1.0);
+    return attenuation * (ambient + diffuse + specular);
+}
+
+vec3 bloom() {
+    vec3 bloomColor = texture(tex[7], fs_in.texcoord).rgb;
+    return bloomColor;
 }
 
 void main(void) {
     if (activeTex == 0) {
-        vec4 color = vec4(1.0);
-        color = texture(tex[4], fs_in.texcoord);
+        vec3 color = vec3(1.0);
+        color = texture(tex[4], fs_in.texcoord).rgb;
         if (enableFeature[0] || enableFeature[3]) {
-            color = vec4(0.0);
+            color = vec3(0.0);
         }
 
         if (enableFeature[0]) {
@@ -101,8 +106,11 @@ void main(void) {
         if (enableFeature[3]) {
             color += point_light();
         }
+        if (enableFeature[4]) {
+            color += bloom();
+        }
 
-        fragColor = color;
+        fragColor = vec4(color, 1.0);
     }
     else if (activeTex == 1 || activeTex == 2) {
         vec3 texel = texture(tex[activeTex], fs_in.texcoord).xyz;

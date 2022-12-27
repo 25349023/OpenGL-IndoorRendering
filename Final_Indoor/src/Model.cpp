@@ -89,6 +89,25 @@ void Model::setTransform(glm::vec3 t, glm::vec3 r, glm::vec3 s)
     scaling = s;
 }
 
+void Model::setEmissive(glm::vec3 em)
+{
+    for (auto& material : materials)
+    {
+        material.setEmissive(em);
+    }
+}
+
+void Model::setDefaultMaterial()
+{
+    for (auto& material : materials)
+    {
+        material.ambient = glm::vec3(1.0);
+        material.diffuse = glm::vec3(0.5);
+        material.specular = glm::vec3(0.5);
+        material.shininess = 225.0;
+    }
+}
+
 void Model::render(ShaderProgram* shaderProgram, bool normalMapEnabled)
 {
     auto sm = SceneManager::Instance();
@@ -132,6 +151,9 @@ void Model::render(ShaderProgram* shaderProgram, bool normalMapEnabled)
             glActiveTexture(GL_TEXTURE2);
             glBindTexture(GL_TEXTURE_2D, material.normalTex);
         }
+
+        glUniform1i(sp["isEmissive"], material.isEmissive);
+        glUniform3fv(sp["em"], 1, glm::value_ptr(material.emission));
         
         glDrawElements(GL_TRIANGLES, shape.drawCount, GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);

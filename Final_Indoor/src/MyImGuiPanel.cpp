@@ -33,6 +33,8 @@ void MyImGuiPanel::update()
         ImGui::RadioButton("Diffuse Color", atexPtr, DIFFUSE_COLOR);
         ImGui::SameLine();
         ImGui::RadioButton("Specular Color", atexPtr, SPECULAR_COLOR);
+        
+        ImGui::RadioButton("Emission Map", atexPtr, EMISSION_MAP);
     }
 
     auto enable = deferredRenderer->enableFeature.data();
@@ -57,7 +59,8 @@ void MyImGuiPanel::update()
             glm::value_ptr(deferredRenderer->pointLightPos), 0.1f);
         ImGui::DragFloat3("Attenuation Setting",
             glm::value_ptr(deferredRenderer->pointLightAttenuation), 0.1f);
-        ImGui::Checkbox("Enable Point Light Effect", enable + POINT_LIGHT);
+        ImGui::Checkbox("Enable Point Light", enable + POINT_LIGHT);
+        ImGui::Checkbox("Enable Bloom Effect", enable + BLOOM_EFFECT);
         ImGui::PopID();
     }
 

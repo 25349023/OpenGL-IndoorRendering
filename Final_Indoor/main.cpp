@@ -48,7 +48,7 @@ DeferredRenderer* deferredRenderer = nullptr;
 
 // ==============================================
 
-Model scene, trice;
+Model scene, trice, lightSphere;
 
 GLuint vao, raw_ssbo, valid_ssbo, drawCmd_ssbo;
 
@@ -135,8 +135,14 @@ void initScene()
     trice = Model("assets/indoor/trice.obj", "assets/indoor/");
     trice.setTransform(glm::vec3(2.05, 0.628725, -1.9), glm::vec3(0), glm::vec3(0.001f));
 
+    lightSphere = Model("assets/indoor/Sphere.obj", "assets/indoor/");
+    lightSphere.setTransform(deferredRenderer->pointLightPos, glm::vec3(0), glm::vec3(0.22f));
+    lightSphere.setDefaultMaterial();
+    lightSphere.setEmissive(glm::vec3(1.0f));
+
     deferredRenderer->appendSceneObj(&scene);
     deferredRenderer->appendSceneObj(&trice);
+    deferredRenderer->appendSceneObj(&lightSphere);
 }
 
 bool initializeGL()
@@ -163,6 +169,13 @@ bool initializeGL()
         return false;
     }
 
+    ShaderProgram* blurShaderProgram = new ShaderProgram(
+        "src\\shader\\blurVertexShader.glsl", "src\\shader\\blurFragmentShader.glsl");
+    if (blurShaderProgram->status() != ShaderProgramStatus::READY)
+    {
+        return false;
+    }
+
     // =================================================================
     m_imguiPanel = new MyImGuiPanel();
 
@@ -174,6 +187,8 @@ bool initializeGL()
     deferredRenderer->screenSP = screenShaderProgram;
 
     deferredRenderer->dirShadowMapper = new DirectionalShadowMapper(depthShaderProgram);
+    deferredRenderer->gaussianBlurrer = new GaussianBlurrer(
+        glm::ivec2(FRAME_WIDTH, FRAME_HEIGHT), blurShaderProgram);
 
     // =================================================================
     // initialize camera

@@ -29,6 +29,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="src\DeferredRenderer.cpp" />
     <ClCompile Include="src\DirectionalShadowMapper.cpp" />
+    <ClCompile Include="src\GaussianBlurrer.cpp" />
     <ClCompile Include="src\glad.c" />
     <ClCompile Include="src\Material.cpp" />
     <ClCompile Include="src\Model.cpp" />
@@ -48,6 +49,7 @@
     <ClInclude Include="..\externals\include\imgui\imstb_truetype.h" />
     <ClInclude Include="src\DeferredRenderer.h" />
     <ClInclude Include="src\DirectionalShadowMapper.h" />
+    <ClInclude Include="src\GaussianBlurrer.h" />
     <ClInclude Include="src\Material.h" />
     <ClInclude Include="src\Model.h" />
     <ClInclude Include="src\MyImGuiPanel.h" />
@@ -76,6 +78,8 @@
     <Content Include="assets\indoor\trice.mtl" />
     <Content Include="assets\indoor\trice.obj" />
     <Content Include="assets\indoor\tricnorm.jpg" />
+    <Content Include="src\shader\blurFragmentShader.glsl" />
+    <Content Include="src\shader\blurVertexShader.glsl" />
     <Content Include="src\shader\depthFragmentShader.glsl" />
     <Content Include="src\shader\depthVertexShader.glsl" />
     <Content Include="src\shader\fbufFragmentShader.glsl" />

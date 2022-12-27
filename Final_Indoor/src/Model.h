@@ -25,6 +25,9 @@ struct Model
     void loadMeshes(const char* path);
     void loadMaterials(const char* path);
     void setTransform(glm::vec3 t, glm::vec3 r, glm::vec3 s);
+    void setEmissive(glm::vec3 em);
+    void setDefaultMaterial();
+    
     void render(ShaderProgram* shaderProgram, bool normalMapEnabled);
 
     std::pair<glm::mat4, glm::mat4> getModelMat();

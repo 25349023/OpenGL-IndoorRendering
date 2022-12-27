@@ -11,17 +11,21 @@ layout (location = 2) out vec4 ambientColorMap;
 layout (location = 3) out vec4 diffuseColorMap;
 layout (location = 4) out vec4 specularColorMap;
 layout (location = 5) out vec4 shininessMap;
+layout (location = 6) out vec4 emissionMap;
 
 uniform int pixelProcessId;
 uniform sampler2D albedoTex;
 uniform sampler2D normalTex;
 uniform vec3 directionalLight;
+
 uniform bool hasNorm;
+uniform bool isEmissive;
 
 uniform vec3 ka;
 uniform vec3 kd;
 uniform vec3 ks;
 uniform float ns;
+uniform vec3 em;
 
 uniform sampler2D shadowTex;
 
@@ -63,4 +67,9 @@ void main() {
     diffuseColorMap = diffuse_color();
     specularColorMap = vec4(ks, 1.0);
     shininessMap = vec4(ns);
+    if (isEmissive) {
+        emissionMap = vec4(em, 1.0);
+    } else {
+        emissionMap = vec4(0.0);
+    }
 }

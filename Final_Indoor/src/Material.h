@@ -2,7 +2,7 @@
 
 
 #include <assimp/material.h>
-#include <glm/vec3.hpp>
+#include <GLM/glm.hpp>
 
 #include "glad/glad.h"
 
@@ -26,12 +26,16 @@ struct Material
     glm::vec3 diffuse{};
     glm::vec3 specular{};
     float shininess{};
+    glm::vec3 emission{};
 
     bool hasTex{false};
     bool hasNorm{false};
+    bool isEmissive{false};
 
     Material() = default;
     
     void extractColorCoef(aiMaterial* aiMaterial);
     void bindTexture(const char* path, bool isNormalMap = false);
+
+    void setEmissive(glm::vec3 em);
 };
