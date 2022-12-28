@@ -59,6 +59,15 @@ void DeferredRenderer::setupFrameBuffer()
     glBindVertexArray(0);
 }
 
+void DeferredRenderer::teardownFrameBuffer()
+{
+    glDeleteVertexArrays(1, &frameVao);
+    glDeleteBuffers(1, &windowVbo);
+    glDeleteFramebuffers(1, &fbo);
+    glDeleteRenderbuffers(1, &depthRbo);
+    glDeleteTextures(attachedTexs.size() - 1, attachedTexs.data() + 1);
+}
+
 void DeferredRenderer::genFBTexture(GLuint& tex, int attachment)
 {
     glGenTextures(1, &tex);
@@ -84,10 +93,12 @@ void DeferredRenderer::updateWindowSize(glm::ivec2 ws)
 {
     winSize = ws;
     glViewport(0, 0, ws.x, ws.y);
+    teardownFrameBuffer();
     setupFrameBuffer();
 
     if (gaussianBlurrer)
     {
+        gaussianBlurrer->teardownFrameBuffer();
         gaussianBlurrer->setupFrameBuffer(ws);
     }
 }

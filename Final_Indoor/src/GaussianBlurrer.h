@@ -11,6 +11,7 @@ public:
 
     GLuint renderBlur(GLuint windowVao, GLuint initEmission);
     void setupFrameBuffer(glm::ivec2 ws);
+    void teardownFrameBuffer();
     
 private:
     ShaderProgram* blurSP{};

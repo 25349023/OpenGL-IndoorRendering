@@ -39,7 +39,6 @@ class DeferredRenderer
 public:
     DeferredRenderer(glm::ivec2 ws);
 
-    // [TODO] free the old source when resizing the window
     void updateWindowSize(glm::ivec2 ws);
     void appendSceneObj(Model* model);
 
@@ -94,5 +93,6 @@ private:
 
     void attachNewFBTexture();
     void setupFrameBuffer();
+    void teardownFrameBuffer();
     void genFBTexture(GLuint& tex, int attachment);
 };

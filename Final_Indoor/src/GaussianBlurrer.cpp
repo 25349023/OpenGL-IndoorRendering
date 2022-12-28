@@ -34,10 +34,16 @@ void GaussianBlurrer::setupFrameBuffer(glm::ivec2 ws)
     }
 }
 
+void GaussianBlurrer::teardownFrameBuffer()
+{
+    glDeleteFramebuffers(2, altFbo);
+    glDeleteTextures(2, altTex);
+}
+
 GLuint GaussianBlurrer::renderBlur(GLuint windowVao, GLuint initEmission)
 {
     bool horizontal = true, first_iteration = true;
-    const int amount = 6;
+    const int amount = 4;
     blurSP->useProgram();
     glUniform1i((*blurSP)["tex"], 0);
     
