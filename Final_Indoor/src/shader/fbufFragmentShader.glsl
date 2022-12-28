@@ -32,24 +32,7 @@ vec3 check_normalize(vec3 v) {
     return normalize(v);
 }
 
-vec3 blinn_phong_shading() {
-    vec3 worldVertex = texture(tex[1], fs_in.texcoord).xyz;
-    vec3 worldNormal = texture(tex[2], fs_in.texcoord).xyz;
-
-    vec3 V = check_normalize(cameraEye - worldVertex);
-    vec3 N = normalize(worldNormal);
-    vec3 L = normalize(directionalLight - worldVertex);
-    vec3 H = normalize(L + V);
-
-    vec3 ka = texture(tex[3], fs_in.texcoord).xyz;
-    vec3 kd = texture(tex[4], fs_in.texcoord).xyz;
-    vec3 ks = texture(tex[5], fs_in.texcoord).xyz;
-    float ns = texture(tex[6], fs_in.texcoord).x;
-
-    vec3 ambient = Ia * ka;
-    vec3 diffuse = Id * max(dot(N, L), 0.0) * kd;
-    vec3 specular = Is * pow(max(dot(N, H), 0.0), ns) * ks;
-
+vec3 blinn_phong_shading(vec3 worldVertex, vec3 worldNormal, vec3 ambient, vec3 diffuse, vec3 specular) {
     float shadow = 1.0;
     if (enableFeature[1]) {
         vec4 f_shadowCoord = shadowMat * vec4(worldVertex, 1.0);
@@ -62,24 +45,7 @@ vec3 blinn_phong_shading() {
     return ambient + shadow * (diffuse + specular);
 }
 
-vec3 point_light() {
-    vec3 worldVertex = texture(tex[1], fs_in.texcoord).xyz;
-    vec3 worldNormal = texture(tex[2], fs_in.texcoord).xyz;
-
-    vec3 V = check_normalize(cameraEye - worldVertex);
-    vec3 N = normalize(worldNormal);
-    vec3 L = normalize(pointLight - worldVertex);
-    vec3 H = normalize(L + V);
-
-    vec3 ka = texture(tex[3], fs_in.texcoord).xyz;
-    vec3 kd = texture(tex[4], fs_in.texcoord).xyz;
-    vec3 ks = texture(tex[5], fs_in.texcoord).xyz;
-    float ns = texture(tex[6], fs_in.texcoord).x;
-
-    vec3 ambient = Ia * ka;
-    vec3 diffuse = Id * max(dot(N, L), 0.0) * kd;
-    vec3 specular = Is * pow(max(dot(N, H), 0.0), ns) * ks;
-
+vec3 point_light(vec3 worldVertex, vec3 ambient, vec3 diffuse, vec3 specular) {
     float dis = length(pointLight - worldVertex);
     float attenuation = 1.0 / (pointLightAttenuation.x + pointLightAttenuation.y * dis +
     pointLightAttenuation.z * (dis * dis));
@@ -94,17 +60,61 @@ vec3 bloom() {
 
 void main(void) {
     if (activeTex == 0) {
-        vec3 color = vec3(1.0);
-        color = texture(tex[4], fs_in.texcoord).rgb;
-        if (enableFeature[0] || enableFeature[3]) {
-            color = vec3(0.0);
+        bool initializeLightParams = false;
+        vec3 worldVertex, worldNormal;
+        vec3 V, N, L, H;
+        vec3 ka, kd, ks;
+        float ns;
+        vec3 ambient, diffuse, specular;
+        
+        vec3 color = vec3(0.0);
+        if (!enableFeature[0] && !enableFeature[3]) {
+            color = texture(tex[4], fs_in.texcoord).rgb;
         }
 
         if (enableFeature[0]) {
-            color += blinn_phong_shading();
+            worldVertex = texture(tex[1], fs_in.texcoord).xyz;
+            worldNormal = texture(tex[2], fs_in.texcoord).xyz;
+
+            V = check_normalize(cameraEye - worldVertex);
+            N = normalize(worldNormal);
+            ka = texture(tex[3], fs_in.texcoord).xyz;
+            kd = texture(tex[4], fs_in.texcoord).xyz;
+            ks = texture(tex[5], fs_in.texcoord).xyz;
+            ns = texture(tex[6], fs_in.texcoord).x;
+
+            L = normalize(directionalLight - worldVertex);
+            H = normalize(L + V);
+
+            ambient = Ia * ka;
+            diffuse = Id * max(dot(N, L), 0.0) * kd;
+            specular = Is * pow(max(dot(N, H), 0.0), ns) * ks;
+            initializeLightParams = true;
+            
+            color += blinn_phong_shading(worldVertex, worldNormal, ambient, diffuse, specular);
         }
         if (enableFeature[3]) {
-            color += point_light();
+            if (!initializeLightParams) {
+                worldVertex = texture(tex[1], fs_in.texcoord).xyz;
+                worldNormal = texture(tex[2], fs_in.texcoord).xyz;
+
+                V = check_normalize(cameraEye - worldVertex);
+                N = normalize(worldNormal);
+                ka = texture(tex[3], fs_in.texcoord).xyz;
+                kd = texture(tex[4], fs_in.texcoord).xyz;
+                ks = texture(tex[5], fs_in.texcoord).xyz;
+                ns = texture(tex[6], fs_in.texcoord).x;
+                initializeLightParams = true;
+            }
+
+            L = normalize(pointLight - worldVertex);
+            H = normalize(L + V);
+
+            ambient = Ia * ka;
+            diffuse = Id * max(dot(N, L), 0.0) * kd;
+            specular = Is * pow(max(dot(N, H), 0.0), ns) * ks;
+            
+            color += point_light(worldVertex, ambient, diffuse, specular);
         }
         if (enableFeature[4]) {
             color += bloom();
