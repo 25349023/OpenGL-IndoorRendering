@@ -72,7 +72,7 @@ void DeferredRenderer::genFBTexture(GLuint& tex, int attachment)
 {
     glGenTextures(1, &tex);
     glBindTexture(GL_TEXTURE_2D, tex);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F,
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F,
         winSize.x, winSize.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);

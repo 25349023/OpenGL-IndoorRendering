@@ -53,7 +53,7 @@ void Material::bindTexture(const char* path, bool isNormalMap)
         glBindTexture(GL_TEXTURE_2D, diffuseTex);
         hasTex = true;
     }
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, texture.width, texture.height, 0,
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texture.width, texture.height, 0,
         GL_RGBA, GL_UNSIGNED_BYTE, texture.data);
     glGenerateMipmap(GL_TEXTURE_2D);
 
