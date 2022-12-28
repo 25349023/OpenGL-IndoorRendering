@@ -59,6 +59,7 @@ void MyImGuiPanel::update()
             glm::value_ptr(deferredRenderer->pointLightPos), 0.1f);
         ImGui::DragFloat3("Attenuation Setting",
             glm::value_ptr(deferredRenderer->pointLightAttenuation), 0.1f);
+        ImGui::ColorEdit3("Light Color", glm::value_ptr(deferredRenderer->pointLightColor));
         ImGui::Checkbox("Enable Point Light", enable + POINT_LIGHT);
         ImGui::Checkbox("Enable Bloom Effect", enable + BLOOM_EFFECT);
         ImGui::PopID();

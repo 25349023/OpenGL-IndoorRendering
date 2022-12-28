@@ -138,7 +138,7 @@ void initScene()
     lightSphere = Model("assets/indoor/Sphere.obj", "assets/indoor/");
     lightSphere.setTransform(deferredRenderer->pointLightPos, glm::vec3(0), glm::vec3(0.22f));
     lightSphere.setDefaultMaterial();
-    lightSphere.setEmissive(glm::vec3(1.0f));
+    lightSphere.setEmissive(deferredRenderer->pointLightColor);
 
     deferredRenderer->appendSceneObj(&scene);
     deferredRenderer->appendSceneObj(&trice);
@@ -252,6 +252,9 @@ void paintGL()
     updateViewMat();
     // ===============================
     // start new frame
+    lightSphere.setTransform(deferredRenderer->pointLightPos, glm::vec3(0), glm::vec3(0.22f));
+    lightSphere.setEmissive(deferredRenderer->pointLightColor);
+    
     deferredRenderer->shadowMapStage();
     deferredRenderer->firstStage();
     deferredRenderer->secondStage();

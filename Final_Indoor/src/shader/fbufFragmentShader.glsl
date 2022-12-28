@@ -11,14 +11,17 @@ uniform vec3 directionalLight;
 uniform sampler2D shadowTex;
 uniform mat4 shadowMat;
 
+uniform sampler2D beforeBloomTex;
 uniform vec3 pointLight;
 uniform vec3 pointLightAttenuation;
+uniform vec3 pointLightColor;
 
 uniform bool enableFeature[5];
 
 uniform vec3 Ia = vec3(0.1);
 uniform vec3 Id = vec3(0.7);
 uniform vec3 Is = vec3(0.2);
+
 
 in VS_OUT
 {
@@ -50,12 +53,18 @@ vec3 point_light(vec3 worldVertex, vec3 ambient, vec3 diffuse, vec3 specular) {
     float attenuation = 1.0 / (pointLightAttenuation.x + pointLightAttenuation.y * dis +
     pointLightAttenuation.z * (dis * dis));
 
-    return attenuation * (ambient + diffuse + specular);
+    return attenuation * pointLightColor * (ambient + diffuse + specular);
 }
 
 vec3 bloom() {
     vec3 bloomColor = texture(tex[7], fs_in.texcoord).rgb;
-    return bloomColor;
+    vec3 emissionColor = texture(beforeBloomTex, fs_in.texcoord).rgb;
+    
+    // HDR
+    const float gamma = 2.2;
+    vec3 hdrColor = 2 * bloomColor + 0.4 * emissionColor;
+    vec3 mapped = hdrColor / (hdrColor + vec3(1.0));
+    return pow(mapped, vec3(1.0 / gamma));
 }
 
 void main(void) {

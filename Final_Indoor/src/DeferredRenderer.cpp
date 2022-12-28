@@ -205,11 +205,16 @@ void DeferredRenderer::secondStage()
     glBindTexture(GL_TEXTURE_2D, dirShadowMapper->depthTex);
     glUniform1i((*screenSP)["shadowTex"], 11);
 
+    glActiveTexture(GL_TEXTURE12);
+    glBindTexture(GL_TEXTURE_2D, attachedTexs[EMISSION_MAP]);
+    glUniform1i((*screenSP)["beforeBloomTex"], 12);
+
     glUniformMatrix4fv((*screenSP)["shadowMat"], 1, false,
         glm::value_ptr(dirShadowMapper->getShadowSBPVMat()));
 
     glUniform3fv((*screenSP)["pointLight"], 1, glm::value_ptr(pointLightPos));
     glUniform3fv((*screenSP)["pointLightAttenuation"], 1, glm::value_ptr(pointLightAttenuation));
+    glUniform3fv((*screenSP)["pointLightColor"], 1, glm::value_ptr(pointLightColor));
 
     for (int i = 0; i < FEATURE_COUNT; ++i)
     {
