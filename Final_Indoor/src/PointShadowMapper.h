@@ -21,7 +21,6 @@ public:
 
     void beforeRender();
     void renderShadowMap(const std::vector<Model*>& sceneObjs);
-    // glm::mat4 getShadowSBPVMat();
 
     friend class DeferredRenderer;
 

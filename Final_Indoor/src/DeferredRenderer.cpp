@@ -192,7 +192,7 @@ void DeferredRenderer::firstStage()
 
     for (auto model : sceneObjects)
     {
-        if (!enableFeature[BLOOM_EFFECT] && model->isEmissive)
+        if (!(enableFeature[POINT_LIGHT] && enableFeature[BLOOM_EFFECT]) && model->isEmissive)
         {
             continue;
         }

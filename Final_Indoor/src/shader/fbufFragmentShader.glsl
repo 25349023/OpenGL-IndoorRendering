@@ -136,9 +136,10 @@ void main(void) {
             specular = Is * pow(max(dot(N, H), 0.0), ns) * ks;
             
             color += point_light(worldVertex, worldNormal, ambient, diffuse, specular);
-        }
-        if (enableFeature[4]) {
-            color += bloom();
+       
+            if (enableFeature[4]) {
+                color += bloom();
+            }
         }
 
         fragColor = vec4(color, 1.0);

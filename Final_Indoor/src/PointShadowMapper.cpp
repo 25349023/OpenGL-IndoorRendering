@@ -44,7 +44,7 @@ void PointShadowMapper::setupDepthFrameBuffer()
 void PointShadowMapper::updateLightVPMat()
 {
     float aspect = (float)shadowMapRes / (float)shadowMapRes;
-    float near = 1.0f;
+    float near = 0.3f;
     float far = 10.0f;
     glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), aspect, near, far);
 
