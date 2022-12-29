@@ -48,6 +48,7 @@ void DirectionalShadowMapper::updateLightVPMat()
 void DirectionalShadowMapper::beforeRender()
 {
     glBindFramebuffer(GL_FRAMEBUFFER, depthFbo);
+    glDrawBuffer(GL_NONE);
     glViewport(0, 0, shadowMapRes, shadowMapRes);
     depthSP->useProgram();
 

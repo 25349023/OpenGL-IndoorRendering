@@ -114,7 +114,7 @@ ShaderProgram::ShaderProgram() : m_programId(0)
     this->m_fsReady = false;
 }
 
-ShaderProgram::ShaderProgram(const char* vsPath, const char* fsPath)
+ShaderProgram::ShaderProgram(const char* vsPath, const char* fsPath, const char* gsPath)
 {
     Shader* vsShader = new Shader(GL_VERTEX_SHADER);
     vsShader->createShaderFromFile(vsPath);
@@ -124,10 +124,22 @@ ShaderProgram::ShaderProgram(const char* vsPath, const char* fsPath)
     fsShader->createShaderFromFile(fsPath);
     std::cout << fsShader->shaderInfoLog() << "\n";
 
+    Shader* gsShader = nullptr;
+
     // shader program
     init();
     attachShader(vsShader);
     attachShader(fsShader);
+
+    if (gsPath)
+    {
+        gsShader = new Shader(GL_GEOMETRY_SHADER);
+        gsShader->createShaderFromFile(gsPath);
+        std::cout << gsShader->shaderInfoLog() << "\n";
+
+        attachShader(gsShader);
+    }
+
     checkStatus();
     if (status() == ShaderProgramStatus::READY)
     {
@@ -136,9 +148,14 @@ ShaderProgram::ShaderProgram(const char* vsPath, const char* fsPath)
 
     vsShader->releaseShader();
     fsShader->releaseShader();
+    if (gsShader)
+    {
+        gsShader->releaseShader();
+    }
 
     delete vsShader;
     delete fsShader;
+    delete gsShader;
 }
 
 ShaderProgram::~ShaderProgram() {}

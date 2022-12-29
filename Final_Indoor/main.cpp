@@ -136,9 +136,9 @@ void initScene()
     trice.setTransform(glm::vec3(2.05, 0.628725, -1.9), glm::vec3(0), glm::vec3(0.001f));
 
     lightSphere = Model("assets/indoor/Sphere.obj", "assets/indoor/");
-    lightSphere.setTransform(deferredRenderer->pointLightPos, glm::vec3(0), glm::vec3(0.22f));
+    lightSphere.setTransform(deferredRenderer->pointShadowMapper->lightPos, glm::vec3(0), glm::vec3(0.22f));
     lightSphere.setDefaultMaterial();
-    lightSphere.setEmissive(deferredRenderer->pointLightColor);
+    lightSphere.setEmissive(deferredRenderer->pointShadowMapper->lightColor);
 
     deferredRenderer->appendSceneObj(&scene);
     deferredRenderer->appendSceneObj(&trice);
@@ -169,6 +169,14 @@ bool initializeGL()
         return false;
     }
 
+    ShaderProgram* pointShaderProgram = new ShaderProgram(
+        "src\\shader\\pointVertexShader.glsl", "src\\shader\\pointFragmentShader.glsl",
+        "src\\shader\\pointGeometryShader.glsl");
+    if (pointShaderProgram->status() != ShaderProgramStatus::READY)
+    {
+        return false;
+    }
+
     ShaderProgram* blurShaderProgram = new ShaderProgram(
         "src\\shader\\blurVertexShader.glsl", "src\\shader\\blurFragmentShader.glsl");
     if (blurShaderProgram->status() != ShaderProgramStatus::READY)
@@ -187,6 +195,7 @@ bool initializeGL()
     deferredRenderer->screenSP = screenShaderProgram;
 
     deferredRenderer->dirShadowMapper = new DirectionalShadowMapper(depthShaderProgram);
+    deferredRenderer->pointShadowMapper = new PointShadowMapper(pointShaderProgram);
     deferredRenderer->gaussianBlurrer = new GaussianBlurrer(
         glm::ivec2(FRAME_WIDTH, FRAME_HEIGHT), blurShaderProgram);
 
@@ -252,8 +261,8 @@ void paintGL()
     updateViewMat();
     // ===============================
     // start new frame
-    lightSphere.setTransform(deferredRenderer->pointLightPos, glm::vec3(0), glm::vec3(0.22f));
-    lightSphere.setEmissive(deferredRenderer->pointLightColor);
+    lightSphere.setTransform(deferredRenderer->pointShadowMapper->lightPos, glm::vec3(0), glm::vec3(0.22f));
+    lightSphere.setEmissive(deferredRenderer->pointShadowMapper->lightColor);
     
     deferredRenderer->shadowMapStage();
     deferredRenderer->firstStage();

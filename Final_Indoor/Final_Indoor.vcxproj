@@ -34,6 +34,7 @@
     <ClCompile Include="src\Material.cpp" />
     <ClCompile Include="src\Model.cpp" />
     <ClCompile Include="src\MyImGuiPanel.cpp" />
+    <ClCompile Include="src\PointShadowMapper.cpp" />
     <ClCompile Include="src\Shader.cpp" />
     <ClCompile Include="src\Shape.cpp" />
   </ItemGroup>
@@ -53,6 +54,7 @@
     <ClInclude Include="src\Material.h" />
     <ClInclude Include="src\Model.h" />
     <ClInclude Include="src\MyImGuiPanel.h" />
+    <ClInclude Include="src\PointShadowMapper.h" />
     <ClInclude Include="src\SceneManager.h" />
     <ClInclude Include="src\Shader.h" />
     <ClInclude Include="src\Shape.h" />
@@ -86,6 +88,9 @@
     <Content Include="src\shader\fbufVertexShader.glsl" />
     <Content Include="src\shader\oglFragmentShader.glsl" />
     <Content Include="src\shader\oglVertexShader.glsl" />
+    <Content Include="src\shader\pointFragmentShader.glsl" />
+    <Content Include="src\shader\pointGeometryShader.glsl" />
+    <Content Include="src\shader\pointVertexShader.glsl" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{ADA5FF44-3FBE-44D5-94ED-FFD82E3DF373}</ProjectGuid>

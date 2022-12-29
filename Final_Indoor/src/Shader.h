@@ -57,8 +57,8 @@ class ShaderProgram
 {
 public:
     ShaderProgram();
-    ShaderProgram(const char* vsPath,const char* fsPath);
-    
+    ShaderProgram(const char* vsPath, const char* fsPath, const char* gsPath = nullptr);
+
     virtual ~ShaderProgram();
 
     bool init();
@@ -69,7 +69,7 @@ public:
 
     GLint getHandle(std::string key);
     GLint operator[](std::string key);
-    
+
     GLuint programId() const;
     ShaderProgramStatus status() const;
 

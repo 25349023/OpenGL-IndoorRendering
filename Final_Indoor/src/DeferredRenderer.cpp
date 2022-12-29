@@ -163,6 +163,11 @@ void DeferredRenderer::shadowMapStage()
     dirShadowMapper->beforeRender();
     clear();
     dirShadowMapper->renderShadowMap(sceneObjects);
+
+    pointShadowMapper->beforeRender();
+    clear();
+    pointShadowMapper->renderShadowMap(sceneObjects);
+
     glViewport(0, 0, winSize.x, winSize.y);
 }
 
@@ -212,9 +217,9 @@ void DeferredRenderer::secondStage()
     glUniformMatrix4fv((*screenSP)["shadowMat"], 1, false,
         glm::value_ptr(dirShadowMapper->getShadowSBPVMat()));
 
-    glUniform3fv((*screenSP)["pointLight"], 1, glm::value_ptr(pointLightPos));
-    glUniform3fv((*screenSP)["pointLightAttenuation"], 1, glm::value_ptr(pointLightAttenuation));
-    glUniform3fv((*screenSP)["pointLightColor"], 1, glm::value_ptr(pointLightColor));
+    glUniform3fv((*screenSP)["pointLight"], 1, glm::value_ptr(pointShadowMapper->lightPos));
+    glUniform3fv((*screenSP)["pointLightAttenuation"], 1, glm::value_ptr(pointShadowMapper->lightAttenuation));
+    glUniform3fv((*screenSP)["pointLightColor"], 1, glm::value_ptr(pointShadowMapper->lightColor));
 
     for (int i = 0; i < FEATURE_COUNT; ++i)
     {

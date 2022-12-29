@@ -7,6 +7,7 @@
 #include "DirectionalShadowMapper.h"
 #include "GaussianBlurrer.h"
 #include "Model.h"
+#include "PointShadowMapper.h"
 #include "Shader.h"
 #include "GLM/glm.hpp"
 #include "glm/gtx/quaternion.hpp"
@@ -69,11 +70,8 @@ public:
     glm::mat4 viewMat{ 1.0 };
 
     DirectionalShadowMapper* dirShadowMapper{};
+    PointShadowMapper* pointShadowMapper{};
     GaussianBlurrer* gaussianBlurrer{};
-
-    glm::vec3 pointLightPos{ 1.87659, 0.4625, 0.103928 };
-    glm::vec3 pointLightAttenuation{ 1.0, 0.7, 0.14 };
-    glm::vec3 pointLightColor{ 1.0, 1.0, 1.0 };
 
 private:
     GLuint frameVao{};

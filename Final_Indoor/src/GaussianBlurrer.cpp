@@ -43,7 +43,7 @@ void GaussianBlurrer::teardownFrameBuffer()
 GLuint GaussianBlurrer::renderBlur(GLuint windowVao, GLuint initEmission)
 {
     bool horizontal = true, first_iteration = true;
-    const int amount = 8;
+    const int amount = 6;
     blurSP->useProgram();
     glUniform1i((*blurSP)["tex"], 0);
     
