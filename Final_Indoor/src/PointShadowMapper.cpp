@@ -87,6 +87,11 @@ void PointShadowMapper::renderShadowMap(const std::vector<Model*>& sceneObjs)
 
     for (auto model : sceneObjs)
     {
+        if (model->isEmissive)
+        {
+            continue;
+        }
+
         glm::mat4 modelMat = model->getModelMat().first;
 
         glUniformMatrix4fv((*depthSP)["modelMat"], 1, false, glm::value_ptr(modelMat));

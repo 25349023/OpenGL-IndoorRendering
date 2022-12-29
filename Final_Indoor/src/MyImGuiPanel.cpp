@@ -62,6 +62,7 @@ void MyImGuiPanel::update()
         ImGui::ColorEdit3("Light Color", glm::value_ptr(deferredRenderer->pointShadowMapper->lightColor));
         ImGui::Checkbox("Enable Point Light", enable + POINT_LIGHT);
         ImGui::Checkbox("Enable Bloom Effect", enable + BLOOM_EFFECT);
+        ImGui::Checkbox("Enable Point Shadow", enable + POINT_SHADOW_MAPPING);
         ImGui::PopID();
     }
 

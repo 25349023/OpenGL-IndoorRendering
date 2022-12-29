@@ -61,6 +61,11 @@ void DirectionalShadowMapper::renderShadowMap(const std::vector<Model*>& sceneOb
 
     for (auto model : sceneObjs)
     {
+        if (model->isEmissive)
+        {
+            continue;
+        }
+        
         glm::mat4 modelMat = model->getModelMat().first;
         glm::mat4 mvp = vpMat * modelMat;
 

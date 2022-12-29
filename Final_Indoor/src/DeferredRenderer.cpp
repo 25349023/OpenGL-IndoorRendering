@@ -160,13 +160,19 @@ void DeferredRenderer::translateCamera(glm::vec3 amount)
 
 void DeferredRenderer::shadowMapStage()
 {
-    dirShadowMapper->beforeRender();
-    clear();
-    dirShadowMapper->renderShadowMap(sceneObjects);
+    if (enableFeature[DIR_SHADOW_MAPPING])
+    {
+        dirShadowMapper->beforeRender();
+        clear();
+        dirShadowMapper->renderShadowMap(sceneObjects);
+    }
 
-    pointShadowMapper->beforeRender();
-    clear();
-    pointShadowMapper->renderShadowMap(sceneObjects);
+    if (enableFeature[POINT_SHADOW_MAPPING])
+    {
+        pointShadowMapper->beforeRender();
+        clear();
+        pointShadowMapper->renderShadowMap(sceneObjects);
+    }
 
     glViewport(0, 0, winSize.x, winSize.y);
 }
@@ -213,6 +219,11 @@ void DeferredRenderer::secondStage()
     glActiveTexture(GL_TEXTURE12);
     glBindTexture(GL_TEXTURE_2D, attachedTexs[EMISSION_MAP]);
     glUniform1i((*screenSP)["beforeBloomTex"], 12);
+
+    glActiveTexture(GL_TEXTURE0);  // same unit can have textures of different type of targets
+    glBindTexture(GL_TEXTURE_CUBE_MAP, pointShadowMapper->depthTex);
+    glUniform1i((*screenSP)["shadowCubeTex"], 0);
+    glUniform1f((*screenSP)["far"], 10.0f);
 
     glUniformMatrix4fv((*screenSP)["shadowMat"], 1, false,
         glm::value_ptr(dirShadowMapper->getShadowSBPVMat()));

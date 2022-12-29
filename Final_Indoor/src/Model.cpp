@@ -95,6 +95,7 @@ void Model::setEmissive(glm::vec3 em)
     {
         material.setEmissive(em);
     }
+    isEmissive = true;
 }
 
 void Model::setDefaultMaterial()

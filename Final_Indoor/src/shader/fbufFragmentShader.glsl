@@ -11,12 +11,15 @@ uniform vec3 directionalLight;
 uniform sampler2D shadowTex;
 uniform mat4 shadowMat;
 
+uniform samplerCube shadowCubeTex;
+uniform float far;
+
 uniform sampler2D beforeBloomTex;
 uniform vec3 pointLight;
 uniform vec3 pointLightAttenuation;
 uniform vec3 pointLightColor;
 
-uniform bool enableFeature[5];
+uniform bool enableFeature[6];
 
 uniform vec3 Ia = vec3(0.1);
 uniform vec3 Id = vec3(0.7);
@@ -48,12 +51,21 @@ vec3 blinn_phong_shading(vec3 worldVertex, vec3 worldNormal, vec3 ambient, vec3 
     return ambient + shadow * (diffuse + specular);
 }
 
-vec3 point_light(vec3 worldVertex, vec3 ambient, vec3 diffuse, vec3 specular) {
+vec3 point_light(vec3 worldVertex, vec3 worldNormal, vec3 ambient, vec3 diffuse, vec3 specular) {
     float dis = length(pointLight - worldVertex);
     float attenuation = 1.0 / (pointLightAttenuation.x + pointLightAttenuation.y * dis +
     pointLightAttenuation.z * (dis * dis));
+    
+    float shadow = 1.0;
+    if (enableFeature[5]) {
+        vec3 lightToVertex = worldVertex - pointLight;
+        float distFromShadowMap = texture(shadowCubeTex, lightToVertex).x * far;
+        
+        float bias = min(0.03, max(0.03 * (1.0 - dot(worldNormal, pointLight)), 0.005));
+        shadow = length(lightToVertex) - bias <= distFromShadowMap ? 1.0 : 0.0;
+    }
 
-    return attenuation * pointLightColor * (ambient + diffuse + specular);
+    return attenuation * pointLightColor * (ambient + shadow * (diffuse + specular));
 }
 
 vec3 bloom() {
@@ -123,7 +135,7 @@ void main(void) {
             diffuse = Id * max(dot(N, L), 0.0) * kd;
             specular = Is * pow(max(dot(N, H), 0.0), ns) * ks;
             
-            color += point_light(worldVertex, ambient, diffuse, specular);
+            color += point_light(worldVertex, worldNormal, ambient, diffuse, specular);
         }
         if (enableFeature[4]) {
             color += bloom();

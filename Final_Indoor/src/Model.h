@@ -19,6 +19,8 @@ struct Model
     glm::vec3 rotation{};
     glm::vec3 scaling{};
 
+    bool isEmissive = false;
+    
     Model() = default;
     Model(const char* mesh_path, const char* asset_root);
 

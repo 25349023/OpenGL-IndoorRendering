@@ -263,7 +263,7 @@ void paintGL()
     // start new frame
     lightSphere.setTransform(deferredRenderer->pointShadowMapper->lightPos, glm::vec3(0), glm::vec3(0.22f));
     lightSphere.setEmissive(deferredRenderer->pointShadowMapper->lightColor);
-    
+
     deferredRenderer->shadowMapStage();
     deferredRenderer->firstStage();
     deferredRenderer->secondStage();
