@@ -1,3 +1,5 @@
+#version 430 core
+
 out vec4 blurredColor;
 
 in vec2 texCoords;

@@ -192,6 +192,10 @@ void DeferredRenderer::firstStage()
 
     for (auto model : sceneObjects)
     {
+        if (!enableFeature[BLOOM_EFFECT] && model->isEmissive)
+        {
+            continue;
+        }
         model->render(fbufSP, enableFeature[NORMAL_MAPPING]);
     }
 
@@ -220,9 +224,9 @@ void DeferredRenderer::secondStage()
     glBindTexture(GL_TEXTURE_2D, attachedTexs[EMISSION_MAP]);
     glUniform1i((*screenSP)["beforeBloomTex"], 12);
 
-    glActiveTexture(GL_TEXTURE0);  // same unit can have textures of different type of targets
+    glActiveTexture(GL_TEXTURE13);
     glBindTexture(GL_TEXTURE_CUBE_MAP, pointShadowMapper->depthTex);
-    glUniform1i((*screenSP)["shadowCubeTex"], 0);
+    glUniform1i((*screenSP)["shadowCubeTex"], 13);
     glUniform1f((*screenSP)["far"], 10.0f);
 
     glUniformMatrix4fv((*screenSP)["shadowMat"], 1, false,
@@ -239,6 +243,10 @@ void DeferredRenderer::secondStage()
         glUniform1i((*screenSP)[uniformName], enableFeature[i]);
     }
 
+    glUniform1i(0, 0);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, attachedTexs[DIFFUSE_COLOR]);
+    
     for (int i = 1; i < GBUFFER_COUNT; ++i)
     {
         glUniform1i(i, i);
