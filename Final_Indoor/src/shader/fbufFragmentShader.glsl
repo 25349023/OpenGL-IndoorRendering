@@ -19,7 +19,7 @@ uniform vec3 pointLight;
 uniform vec3 pointLightAttenuation;
 uniform vec3 pointLightColor;
 
-uniform bool enableFeature[6];
+uniform bool enableFeature[7];
 
 uniform vec3 Ia = vec3(0.1);
 uniform vec3 Id = vec3(0.7);
@@ -88,6 +88,8 @@ void main(void) {
         float ns;
         vec3 ambient, diffuse, specular;
         
+        int cel_step_count = 3;
+        
         vec3 color = vec3(0.0);
         if (!enableFeature[0] && !enableFeature[3]) {
             color = texture(tex[4], fs_in.texcoord).rgb;
@@ -141,6 +143,39 @@ void main(void) {
                 color += bloom();
             }
         }
+
+        if (enableFeature[6]) {
+            float sobel_x[][3] = {{1, 0, -1}, {2, 0, -2}, {1, 0, -1}};
+            float sobel_y[][3] = {{1, 2, 1}, {0, 0, 0}, {-1, -2, -1}};
+            vec2 tex_offset = 1.0 / textureSize(tex[0], 0);
+            vec3 hori_edge = vec3(0), vert_edge = vec3(0);
+            for (int i = -1; i <= 1; i++) {
+                for (int j = -1; j <= 1; j++) {
+                    hori_edge += texture(tex[0], fs_in.texcoord + tex_offset * vec2(i, j)).rgb * sobel_x[1-i][1-j];
+                    vert_edge += texture(tex[0], fs_in.texcoord + tex_offset * vec2(i, j)).rgb * sobel_y[1-i][1-j];
+                }
+            }
+            if (any(greaterThanEqual(abs(hori_edge), vec3(0.5))) || any(greaterThanEqual(abs(vert_edge), vec3(0.5)))) {
+                color = vec3(0.0);
+            } 
+            else {
+                N = normalize(worldNormal);
+                L = normalize(directionalLight - worldVertex);
+
+                float nl = dot(N, L);
+                float multiplier = 1.0;
+
+                if (nl > 0.5) 
+                    multiplier = 1.0;
+                else if (nl > 0.0)
+                    multiplier = 0.7;
+                else 
+                    multiplier = 0.2;
+
+                color *= multiplier;
+            }
+        }
+
 
         fragColor = vec4(color, 1.0);
     }

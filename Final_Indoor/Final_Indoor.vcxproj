@@ -37,6 +37,7 @@
     <ClCompile Include="src\PointShadowMapper.cpp" />
     <ClCompile Include="src\Shader.cpp" />
     <ClCompile Include="src\Shape.cpp" />
+    <ClCompile Include="src\SobelEdgeDetection.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\externals\include\imgui\imconfig.h" />
@@ -58,6 +59,7 @@
     <ClInclude Include="src\SceneManager.h" />
     <ClInclude Include="src\Shader.h" />
     <ClInclude Include="src\Shape.h" />
+    <ClInclude Include="src\SobelEdgeDetection.h" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="assets\indoor\Grey_White_Room.mtl" />
@@ -91,6 +93,21 @@
     <Content Include="src\shader\pointFragmentShader.glsl" />
     <Content Include="src\shader\pointGeometryShader.glsl" />
     <Content Include="src\shader\pointVertexShader.glsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="src\shader\blurFragmentShader.glsl" />
+    <None Include="src\shader\blurVertexShader.glsl" />
+    <None Include="src\shader\depthFragmentShader.glsl" />
+    <None Include="src\shader\depthVertexShader.glsl" />
+    <None Include="src\shader\edgeFragmentShader.glsl" />
+    <None Include="src\shader\edgeVertexShader.glsl" />
+    <None Include="src\shader\fbufFragmentShader.glsl" />
+    <None Include="src\shader\fbufVertexShader.glsl" />
+    <None Include="src\shader\oglFragmentShader.glsl" />
+    <None Include="src\shader\oglVertexShader.glsl" />
+    <None Include="src\shader\pointFragmentShader.glsl" />
+    <None Include="src\shader\pointGeometryShader.glsl" />
+    <None Include="src\shader\pointVertexShader.glsl" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{ADA5FF44-3FBE-44D5-94ED-FFD82E3DF373}</ProjectGuid>

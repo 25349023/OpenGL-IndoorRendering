@@ -184,6 +184,13 @@ bool initializeGL()
         return false;
     }
 
+    ShaderProgram* edgeShaderProgram = new ShaderProgram(
+        "src\\shader\\edgeVertexShader.glsl", "src\\shader\\edgeFragmentShader.glsl");
+    if (blurShaderProgram->status() != ShaderProgramStatus::READY)
+    {
+        return false;
+    }
+
     // =================================================================
     m_imguiPanel = new MyImGuiPanel();
 
@@ -198,6 +205,8 @@ bool initializeGL()
     deferredRenderer->pointShadowMapper = new PointShadowMapper(pointShaderProgram);
     deferredRenderer->gaussianBlurrer = new GaussianBlurrer(
         glm::ivec2(FRAME_WIDTH, FRAME_HEIGHT), blurShaderProgram);
+    deferredRenderer->sobelEdgeDetection = new SobelEdgeDetection(
+        glm::ivec2(FRAME_WIDTH, FRAME_HEIGHT), edgeShaderProgram);
 
     // =================================================================
     // initialize camera

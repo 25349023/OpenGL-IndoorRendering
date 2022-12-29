@@ -101,6 +101,11 @@ void DeferredRenderer::updateWindowSize(glm::ivec2 ws)
         gaussianBlurrer->teardownFrameBuffer();
         gaussianBlurrer->setupFrameBuffer(ws);
     }
+    if (sobelEdgeDetection)
+    {
+        sobelEdgeDetection->teardownFrameBuffer();
+        sobelEdgeDetection->setupFrameBuffer(ws);
+    }
 }
 
 void DeferredRenderer::appendSceneObj(Model* model)

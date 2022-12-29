@@ -6,6 +6,7 @@
 
 #include "DirectionalShadowMapper.h"
 #include "GaussianBlurrer.h"
+#include "SobelEdgeDetection.h"
 #include "Model.h"
 #include "PointShadowMapper.h"
 #include "Shader.h"
@@ -33,6 +34,7 @@ enum Feature
     POINT_LIGHT,
     BLOOM_EFFECT,
     POINT_SHADOW_MAPPING,
+    NON_PHOTOREALISTIC_RENDERING,
     FEATURE_COUNT
 };
 
@@ -73,6 +75,7 @@ public:
     DirectionalShadowMapper* dirShadowMapper{};
     PointShadowMapper* pointShadowMapper{};
     GaussianBlurrer* gaussianBlurrer{};
+    SobelEdgeDetection* sobelEdgeDetection{};
 
 private:
     GLuint frameVao{};
