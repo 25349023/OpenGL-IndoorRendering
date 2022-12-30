@@ -6,7 +6,6 @@
 #include <glm/gtx/quaternion.hpp>
 
 #include "DeferredRenderer.h"
-#include "DeferredRenderer.h"
 #include "SceneManager.h"
 
 
@@ -17,6 +16,20 @@ Model::Model(const char* mesh_path, const char* asset_root)
 
     aiReleaseImport(model);
     model = nullptr;
+}
+
+Model Model::quad()
+{
+    Model quadModel;
+
+    Shape shape;
+    shape.initQuad();
+    quadModel.shapes.push_back(shape);
+
+    quadModel.materials.emplace_back();
+    quadModel.setDefaultMaterial();
+
+    return quadModel;
 }
 
 void Model::loadMeshes(const char* path)
@@ -75,7 +88,6 @@ void Model::loadMaterials(const char* asset_root)
             std::cout << "Loading normal maps: " << full_path << std::endl;
 
             material.bindTexture(full_path, true);
-            
         }
 
         materials.push_back(material);
@@ -145,7 +157,7 @@ void Model::render(ShaderProgram* shaderProgram, bool normalMapEnabled)
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, material.diffuseTex);
         }
-        
+
         glUniform1i(sp["hasNorm"], material.hasNorm && normalMapEnabled);
         if (material.hasNorm)
         {
@@ -155,7 +167,7 @@ void Model::render(ShaderProgram* shaderProgram, bool normalMapEnabled)
 
         glUniform1i(sp["isEmissive"], material.isEmissive);
         glUniform3fv(sp["em"], 1, glm::value_ptr(material.emission));
-        
+
         glDrawElements(GL_TRIANGLES, shape.drawCount, GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
     }
@@ -172,55 +184,4 @@ std::pair<glm::mat4, glm::mat4> Model::getModelMat()
     S = glm::scale(S, scaling);
 
     return std::make_pair(T * R * S, R);
-}
-
-Model Model::merge(std::vector<Model>& models)
-{
-    Model merged;
-    for (auto& model : models)
-    {
-        merged.shapes.insert(merged.shapes.end(), model.shapes.begin(), model.shapes.end());
-        merged.materials.insert(merged.materials.end(), model.materials.begin(), model.materials.end());
-    }
-
-    return merged;
-
-    // merge shapes
-    // auto& shape = merged.shape;
-    // for (int i = 0; i < models.size(); ++i)
-    // {
-    //     merged.baseVertices.push_back(shape.vertices.size());
-    //
-    //     for (Vertex& v : models[i].shape.vertices)
-    //     {
-    //         v.tex_coords.z = (float)i;
-    //     }
-    //
-    //     shape.vertices.insert(shape.vertices.end(),
-    //         models[i].shape.vertices.begin(), models[i].shape.vertices.end());
-    //     shape.indices.insert(shape.indices.end(),
-    //         models[i].shape.indices.begin(), models[i].shape.indices.end());
-    //
-    //     merged.drawCounts.push_back(models[i].shape.drawCount);
-    //     shape.drawCount += models[i].shape.drawCount;
-    // }
-    //
-    // shape.bindBuffers();
-    //
-    // // merge textures
-    // auto& texture = merged.material.texture;
-    // texture.height = models[0].material.texture.height;
-    // texture.width = models[0].material.texture.width;
-    //
-    // size_t texture_size = texture.width * texture.height * 4;
-    // texture.data = new unsigned char[texture_size * models.size()];
-    //
-    // for (int i = 0; i < models.size(); ++i)
-    // {
-    //     memcpy(texture.data + texture_size * i, models[i].material.texture.data, texture_size);
-    // }
-    //
-    // merged.material.bindTexture2DArray(models.size());
-
-    // return merged;
 }

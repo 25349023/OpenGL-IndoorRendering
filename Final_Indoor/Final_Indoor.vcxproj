@@ -27,6 +27,7 @@
     <ClCompile Include="..\externals\include\imgui\imgui_tables.cpp" />
     <ClCompile Include="..\externals\include\imgui\imgui_widgets.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="src\AreaLight.cpp" />
     <ClCompile Include="src\DeferredRenderer.cpp" />
     <ClCompile Include="src\DirectionalShadowMapper.cpp" />
     <ClCompile Include="src\GaussianBlurrer.cpp" />
@@ -48,9 +49,11 @@
     <ClInclude Include="..\externals\include\imgui\imstb_rectpack.h" />
     <ClInclude Include="..\externals\include\imgui\imstb_textedit.h" />
     <ClInclude Include="..\externals\include\imgui\imstb_truetype.h" />
+    <ClInclude Include="src\AreaLight.h" />
     <ClInclude Include="src\DeferredRenderer.h" />
     <ClInclude Include="src\DirectionalShadowMapper.h" />
     <ClInclude Include="src\GaussianBlurrer.h" />
+    <ClInclude Include="src\ltc_matrix.hpp" />
     <ClInclude Include="src\Material.h" />
     <ClInclude Include="src\Model.h" />
     <ClInclude Include="src\MyImGuiPanel.h" />

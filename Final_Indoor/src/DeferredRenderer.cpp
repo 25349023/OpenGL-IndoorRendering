@@ -199,6 +199,11 @@ void DeferredRenderer::firstStage()
         model->render(fbufSP, enableFeature[NORMAL_MAPPING]);
     }
 
+    if (enableFeature[AREA_LIGHT] && enableFeature[BLOOM_EFFECT])
+    {
+        areaLight->quad.render(fbufSP, enableFeature[NORMAL_MAPPING]);
+    }
+
     if (enableFeature[BLOOM_EFFECT])
     {
         blurredTex = gaussianBlurrer->renderBlur(frameVao, attachedTexs[EMISSION_MAP]);
@@ -236,6 +241,25 @@ void DeferredRenderer::secondStage()
     glUniform3fv((*screenSP)["pointLightAttenuation"], 1, glm::value_ptr(pointShadowMapper->lightAttenuation));
     glUniform3fv((*screenSP)["pointLightColor"], 1, glm::value_ptr(pointShadowMapper->lightColor));
 
+    // [TODO] pass uniforms of area light
+    glActiveTexture(GL_TEXTURE14);
+    glBindTexture(GL_TEXTURE_2D, areaLight->ltc1);
+    glUniform1i((*screenSP)["LTC1"], 14);
+
+    glActiveTexture(GL_TEXTURE15);
+    glBindTexture(GL_TEXTURE_2D, areaLight->ltc2);
+    glUniform1i((*screenSP)["LTC2"], 15);
+
+    auto& quadVertex = areaLight->quad.shapes[0].vertices;
+    glm::mat4 quadModelMat = areaLight->quad.getModelMat().first;
+    for (int i = 0; i < 4; ++i)
+    {
+        std::string uniformName = std::string("areaLightPoints[") + std::to_string(i) + "]";
+        glm::vec3 worldPos = glm::vec3(quadModelMat * glm::vec4(quadVertex[i].position, 1.0));
+        glUniform3fv((*screenSP)[uniformName], 1, glm::value_ptr(worldPos));
+    }
+    glUniform3fv((*screenSP)["areaLightColor"], 1, glm::value_ptr(areaLight->quad.materials[0].emission));
+
     for (int i = 0; i < FEATURE_COUNT; ++i)
     {
         char uniformName[24];
@@ -246,7 +270,7 @@ void DeferredRenderer::secondStage()
     glUniform1i(0, 0);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, attachedTexs[DIFFUSE_COLOR]);
-    
+
     for (int i = 1; i < GBUFFER_COUNT; ++i)
     {
         glUniform1i(i, i);

@@ -23,6 +23,7 @@ struct Model
     
     Model() = default;
     Model(const char* mesh_path, const char* asset_root);
+    static Model quad();
 
     void loadMeshes(const char* path);
     void loadMaterials(const char* path);
@@ -33,7 +34,5 @@ struct Model
     void render(ShaderProgram* shaderProgram, bool normalMapEnabled);
 
     std::pair<glm::mat4, glm::mat4> getModelMat();
-
-    static Model merge(std::vector<Model>& models);
 };
 

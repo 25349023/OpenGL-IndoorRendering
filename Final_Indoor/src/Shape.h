@@ -35,4 +35,6 @@ struct Shape
     void extractMeshData(const aiMesh* mesh);
     void extractMeshIndices(const aiMesh* mesh);
     void bindBuffers();
+
+    void initQuad();
 };

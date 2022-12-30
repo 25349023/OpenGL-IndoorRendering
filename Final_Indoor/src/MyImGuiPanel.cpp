@@ -65,5 +65,19 @@ void MyImGuiPanel::update()
         ImGui::Checkbox("Enable Point Shadow", enable + POINT_SHADOW_MAPPING);
         ImGui::PopID();
     }
+    
+    if (ImGui::CollapsingHeader("Area Light"))
+    {
+        ImGui::PushID("Area");
+        ImGui::DragFloat3("Light Position",
+            glm::value_ptr(deferredRenderer->areaLight->lightPos), 0.01f);
+        ImGui::DragFloat3("Light Rotation",
+            glm::value_ptr(deferredRenderer->areaLight->lightRot), 0.01f);
+        ImGui::DragFloat2("Light Area",
+            glm::value_ptr(deferredRenderer->areaLight->lightScale), 0.01f);
+        ImGui::ColorEdit3("Light Color", glm::value_ptr(deferredRenderer->areaLight->lightColor));
+        ImGui::Checkbox("Enable Area Light", enable + AREA_LIGHT);
+        ImGui::PopID();
+    }
 
 }

@@ -4,6 +4,7 @@
 #include <vector>
 #include <glad/glad.h>
 
+#include "AreaLight.h"
 #include "DirectionalShadowMapper.h"
 #include "GaussianBlurrer.h"
 #include "Model.h"
@@ -33,6 +34,7 @@ enum Feature
     POINT_LIGHT,
     BLOOM_EFFECT,
     POINT_SHADOW_MAPPING,
+    AREA_LIGHT,
     FEATURE_COUNT
 };
 
@@ -73,6 +75,7 @@ public:
     DirectionalShadowMapper* dirShadowMapper{};
     PointShadowMapper* pointShadowMapper{};
     GaussianBlurrer* gaussianBlurrer{};
+    AreaLight* areaLight;
 
 private:
     GLuint frameVao{};
