@@ -24,7 +24,7 @@ uniform sampler2D LTC2; // GGX norm, fresnel, 0(unused), sphere
 uniform vec3 areaLightPoints[4];
 uniform vec3 areaLightColor;
 
-uniform bool enableFeature[7];
+uniform bool enableFeature[8];
 
 uniform vec3 Ia = vec3(0.1);
 uniform vec3 Id = vec3(0.7);
@@ -272,15 +272,15 @@ void main(void) {
             color += area_light(worldVertex, N, V, kd, ks);
         }
 
-        if (enableFeature[6]) {
-            float sobel_x[][3] = {{1, 0, -1}, {2, 0, -2}, {1, 0, -1}};
-            float sobel_y[][3] = {{1, 2, 1}, {0, 0, 0}, {-1, -2, -1}};
+        if (enableFeature[7]) {
+            float sobel_x[9] = {1, 0, -1, 2, 0, -2, 1, 0, -1};
+            float sobel_y[9] = {1, 2, 1, 0, 0, 0, -1, -2, -1};
             vec2 tex_offset = 1.0 / textureSize(tex[0], 0);
             vec3 hori_edge = vec3(0), vert_edge = vec3(0);
             for (int i = -1; i <= 1; i++) {
                 for (int j = -1; j <= 1; j++) {
-                    hori_edge += texture(tex[0], fs_in.texcoord + tex_offset * vec2(i, j)).rgb * sobel_x[1-i][1-j];
-                    vert_edge += texture(tex[0], fs_in.texcoord + tex_offset * vec2(i, j)).rgb * sobel_y[1-i][1-j];
+                    hori_edge += texture(tex[0], fs_in.texcoord + tex_offset * vec2(i, j)).rgb * sobel_x[(1-i)*3+(1-j)];
+                    vert_edge += texture(tex[0], fs_in.texcoord + tex_offset * vec2(i, j)).rgb * sobel_y[(1-i)*3+(1-j)];
                 }
             }
             if (any(greaterThanEqual(abs(hori_edge), vec3(0.5))) || any(greaterThanEqual(abs(vert_edge), vec3(0.5)))) {
