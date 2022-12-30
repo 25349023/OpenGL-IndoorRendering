@@ -68,3 +68,28 @@ void Shape::bindBuffers()
 
     glBindVertexArray(0);
 }
+
+void Shape::initQuad()
+{
+    const glm::vec3 quadVertexPts[4] =
+    {
+        glm::vec3(-0.5f, 0.0f, -0.5f),
+        glm::vec3(-0.5f, 0.0f, 0.5f),
+        glm::vec3(0.5f, 0.0f, 0.5f),
+        glm::vec3(0.5f, 0.0f, -0.5f)
+    };
+
+    for (auto point : quadVertexPts)
+    {
+        Vertex v;
+        v.position = point;
+        v.normal = glm::vec3(0.0f, 1.0f, 0.0f);
+        vertices.push_back(v);
+    }
+    indices.insert(indices.begin(), {0, 3, 1, 1, 3, 2});
+    
+    materialId = 0;
+    drawCount = 6;
+
+    bindBuffers();
+}

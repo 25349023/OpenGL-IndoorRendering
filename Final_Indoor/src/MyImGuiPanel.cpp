@@ -9,8 +9,25 @@ MyImGuiPanel::~MyImGuiPanel() {}
 
 void MyImGuiPanel::update()
 {
-    // performance information
     ImGui::TextColored(ImVec4(0, 180, 0, 210), "FPS: %.2f", ImGui::GetIO().Framerate);
+
+    if (ImGui::Button("Enable all"))
+    {
+        for (int i = 0; i < deferredRenderer->enableFeature.size(); ++i)
+        {
+            deferredRenderer->enableFeature[i] = true;
+        }
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("Disable all"))
+    {
+        for (int i = 0; i < deferredRenderer->enableFeature.size(); ++i)
+        {
+            deferredRenderer->enableFeature[i] = false;
+        }
+    }
+
+    auto enable = deferredRenderer->enableFeature.data();
 
     if (ImGui::CollapsingHeader("Camera settings"))
     {
@@ -33,11 +50,10 @@ void MyImGuiPanel::update()
         ImGui::RadioButton("Diffuse Color", atexPtr, DIFFUSE_COLOR);
         ImGui::SameLine();
         ImGui::RadioButton("Specular Color", atexPtr, SPECULAR_COLOR);
-        
+
         ImGui::RadioButton("Emission Map", atexPtr, EMISSION_MAP);
     }
 
-    auto enable = deferredRenderer->enableFeature.data();
     if (ImGui::CollapsingHeader("Blinn-Phong Shading"))
     {
         ImGui::PushID("Directional");
@@ -49,9 +65,10 @@ void MyImGuiPanel::update()
         ImGui::Checkbox("Enable Directional Shadow Mapping", enable + DIR_SHADOW_MAPPING);
         ImGui::PopID();
     }
-    
+
     ImGui::Checkbox("Enable Normal Mapping", enable + NORMAL_MAPPING);
-    
+    ImGui::Checkbox("Enable Bloom Effect", enable + BLOOM_EFFECT);
+
     if (ImGui::CollapsingHeader("Point Light"))
     {
         ImGui::PushID("Point");
@@ -61,11 +78,23 @@ void MyImGuiPanel::update()
             glm::value_ptr(deferredRenderer->pointShadowMapper->lightAttenuation), 0.01f);
         ImGui::ColorEdit3("Light Color", glm::value_ptr(deferredRenderer->pointShadowMapper->lightColor));
         ImGui::Checkbox("Enable Point Light", enable + POINT_LIGHT);
-        ImGui::Checkbox("Enable Bloom Effect", enable + BLOOM_EFFECT);
         ImGui::Checkbox("Enable Point Shadow", enable + POINT_SHADOW_MAPPING);
         ImGui::PopID();
     }
 
+    if (ImGui::CollapsingHeader("Area Light"))
+    {
+        ImGui::PushID("Area");
+        ImGui::DragFloat3("Light Position",
+            glm::value_ptr(deferredRenderer->areaLight->lightPos), 0.01f);
+        ImGui::DragFloat3("Light Rotation",
+            glm::value_ptr(deferredRenderer->areaLight->lightRot), 0.01f);
+        ImGui::DragFloat2("Light Area",
+            glm::value_ptr(deferredRenderer->areaLight->lightScale), 0.01f);
+        ImGui::ColorEdit3("Light Color", glm::value_ptr(deferredRenderer->areaLight->lightColor));
+        ImGui::Checkbox("Enable Area Light", enable + AREA_LIGHT);
+        ImGui::PopID();
+    }
     ImGui::Checkbox("Enable Non-photorealistic rendering", enable + NON_PHOTOREALISTIC_RENDERING);
 
 }

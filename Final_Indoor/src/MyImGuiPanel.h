@@ -1,4 +1,5 @@
 #pragma once
+#define GLM_FORCE_SWIZZLE
 
 #include <imgui\imgui.h>
 #include <imgui\imgui_impl_glfw.h>

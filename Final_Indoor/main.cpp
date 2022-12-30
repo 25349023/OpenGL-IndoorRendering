@@ -9,6 +9,7 @@
 #include "assimp/cimport.h"
 #include "assimp/scene.h"
 #include "assimp/postprocess.h"
+#include "src/AreaLight.h"
 #include "src/DeferredRenderer.h"
 #include "src/DirectionalShadowMapper.h"
 
@@ -143,6 +144,11 @@ void initScene()
     deferredRenderer->appendSceneObj(&scene);
     deferredRenderer->appendSceneObj(&trice);
     deferredRenderer->appendSceneObj(&lightSphere);
+
+    deferredRenderer->areaLight = new AreaLight(
+        glm::vec3(1.0, 0.5, -0.5), glm::vec3(glm::radians(-90.0f), 0, 0),
+        glm::vec2(1.0), glm::vec3(0.6, 0.4, 0.0)
+    );
 }
 
 bool initializeGL()
@@ -272,6 +278,7 @@ void paintGL()
     // start new frame
     lightSphere.setTransform(deferredRenderer->pointShadowMapper->lightPos, glm::vec3(0), glm::vec3(0.22f));
     lightSphere.setEmissive(deferredRenderer->pointShadowMapper->lightColor);
+    deferredRenderer->areaLight->updateParameters();
 
     deferredRenderer->shadowMapStage();
     deferredRenderer->firstStage();

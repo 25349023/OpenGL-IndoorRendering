@@ -4,6 +4,7 @@
 #include <vector>
 #include <glad/glad.h>
 
+#include "AreaLight.h"
 #include "DirectionalShadowMapper.h"
 #include "GaussianBlurrer.h"
 #include "SobelEdgeDetection.h"
@@ -34,6 +35,7 @@ enum Feature
     POINT_LIGHT,
     BLOOM_EFFECT,
     POINT_SHADOW_MAPPING,
+    AREA_LIGHT,
     NON_PHOTOREALISTIC_RENDERING,
     FEATURE_COUNT
 };
@@ -75,6 +77,7 @@ public:
     DirectionalShadowMapper* dirShadowMapper{};
     PointShadowMapper* pointShadowMapper{};
     GaussianBlurrer* gaussianBlurrer{};
+    AreaLight* areaLight;
     SobelEdgeDetection* sobelEdgeDetection{};
 
 private:

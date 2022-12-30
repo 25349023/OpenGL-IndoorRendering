@@ -68,7 +68,7 @@ void main() {
     specularColorMap = vec4(ks, 1.0);
     shininessMap = vec4(ns);
     if (isEmissive) {
-        emissionMap = vec4(em, 1.0);
+        emissionMap = vec4(em + 0.01, 1.0);
     } else {
         emissionMap = vec4(0.0);
     }
