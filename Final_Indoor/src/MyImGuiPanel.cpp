@@ -11,10 +11,23 @@ void MyImGuiPanel::update()
 {
     ImGui::TextColored(ImVec4(0, 180, 0, 210), "FPS: %.2f", ImGui::GetIO().Framerate);
 
+    if (ImGui::Button("Enable all"))
+    {
+        for (int i = 0; i < deferredRenderer->enableFeature.size(); ++i)
+        {
+            deferredRenderer->enableFeature[i] = true;
+        }
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("Disable all"))
+    {
+        for (int i = 0; i < deferredRenderer->enableFeature.size(); ++i)
+        {
+            deferredRenderer->enableFeature[i] = false;
+        }
+    }
+
     auto enable = deferredRenderer->enableFeature.data();
-    
-    ImGui::Checkbox("Enable Normal Mapping", enable + NORMAL_MAPPING);
-    ImGui::Checkbox("Enable Bloom Effect", enable + BLOOM_EFFECT);
 
     if (ImGui::CollapsingHeader("Camera settings"))
     {
@@ -37,7 +50,7 @@ void MyImGuiPanel::update()
         ImGui::RadioButton("Diffuse Color", atexPtr, DIFFUSE_COLOR);
         ImGui::SameLine();
         ImGui::RadioButton("Specular Color", atexPtr, SPECULAR_COLOR);
-        
+
         ImGui::RadioButton("Emission Map", atexPtr, EMISSION_MAP);
     }
 
@@ -52,7 +65,9 @@ void MyImGuiPanel::update()
         ImGui::Checkbox("Enable Directional Shadow Mapping", enable + DIR_SHADOW_MAPPING);
         ImGui::PopID();
     }
-    
+
+    ImGui::Checkbox("Enable Normal Mapping", enable + NORMAL_MAPPING);
+    ImGui::Checkbox("Enable Bloom Effect", enable + BLOOM_EFFECT);
 
     if (ImGui::CollapsingHeader("Point Light"))
     {
@@ -66,7 +81,7 @@ void MyImGuiPanel::update()
         ImGui::Checkbox("Enable Point Shadow", enable + POINT_SHADOW_MAPPING);
         ImGui::PopID();
     }
-    
+
     if (ImGui::CollapsingHeader("Area Light"))
     {
         ImGui::PushID("Area");
@@ -80,5 +95,4 @@ void MyImGuiPanel::update()
         ImGui::Checkbox("Enable Area Light", enable + AREA_LIGHT);
         ImGui::PopID();
     }
-
 }
