@@ -38,7 +38,7 @@ void SobelEdgeDetection::teardownFrameBuffer()
     glDeleteTextures(1, altTex);
 }
 
-GLuint SobelEdgeDetection::renderEdge(GLuint windowVao)
+GLuint SobelEdgeDetection::renderEdge(GLuint windowVao, GLuint tex)
 {
     edgeSP->useProgram();
     glUniform1i((*edgeSP)["tex"], 0);
@@ -46,7 +46,7 @@ GLuint SobelEdgeDetection::renderEdge(GLuint windowVao)
     glBindFramebuffer(GL_FRAMEBUFFER, altFbo[0]);
 
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, altTex[0]);
+    glBindTexture(GL_TEXTURE_2D, tex);
         
     glBindVertexArray(windowVao);
     glDrawArrays(GL_TRIANGLE_FAN, 0, 4);

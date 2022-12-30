@@ -168,6 +168,13 @@ bool initializeGL()
         return false;
     }
 
+    ShaderProgram* postScreenShaderProgram = new ShaderProgram(
+        "src\\shader\\postVertexShader.glsl", "src\\shader\\postFragmentShader.glsl");
+    if (postScreenShaderProgram->status() != ShaderProgramStatus::READY)
+    {
+        return false;
+    }
+
     ShaderProgram* depthShaderProgram = new ShaderProgram(
         "src\\shader\\depthVertexShader.glsl", "src\\shader\\depthFragmentShader.glsl");
     if (depthShaderProgram->status() != ShaderProgramStatus::READY)
@@ -206,6 +213,7 @@ bool initializeGL()
     deferredRenderer = new DeferredRenderer(glm::ivec2(FRAME_WIDTH, FRAME_HEIGHT));
     deferredRenderer->fbufSP = shaderProgram;
     deferredRenderer->screenSP = screenShaderProgram;
+    deferredRenderer->postScreenSP = postScreenShaderProgram;
 
     deferredRenderer->dirShadowMapper = new DirectionalShadowMapper(depthShaderProgram);
     deferredRenderer->pointShadowMapper = new PointShadowMapper(pointShaderProgram);
@@ -283,6 +291,7 @@ void paintGL()
     deferredRenderer->shadowMapStage();
     deferredRenderer->firstStage();
     deferredRenderer->secondStage();
+    deferredRenderer->thirdStage();
 
     // ===============================
 

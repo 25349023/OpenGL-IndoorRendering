@@ -56,6 +56,7 @@ public:
     void shadowMapStage();
     void firstStage();
     void secondStage();
+    void thirdStage();
 
     void clear();
 
@@ -70,6 +71,7 @@ public:
     // [TODO] make fbufSP, screenSP private and initialize through the ctor
     ShaderProgram* fbufSP{};
     ShaderProgram* screenSP{};
+    ShaderProgram* postScreenSP{};
 
     glm::mat4 projMat{ 1.0 };
     glm::mat4 viewMat{ 1.0 };
@@ -83,7 +85,7 @@ public:
 private:
     GLuint frameVao{};
     GLuint windowVbo{};
-    GLuint fbo{};
+    GLuint fbo[2]{};
     GLuint depthRbo{};
 
     std::vector<Model*> sceneObjects;
@@ -92,6 +94,7 @@ private:
     std::vector<GLenum> drawBuffers{};
     GLuint activeTex{};
     GLuint blurredTex{};
+    GLuint secondOutputTex{};
 
     std::array<bool, FEATURE_COUNT> enableFeature{};
 

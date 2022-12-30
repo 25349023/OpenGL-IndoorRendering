@@ -9,7 +9,7 @@ class SobelEdgeDetection
 public:
     SobelEdgeDetection(glm::ivec2 ws, ShaderProgram* sp);
 
-    GLuint renderEdge(GLuint windowVao);
+    GLuint renderEdge(GLuint windowVao, GLuint tex);
     void setupFrameBuffer(glm::ivec2 ws);
     void teardownFrameBuffer();
     

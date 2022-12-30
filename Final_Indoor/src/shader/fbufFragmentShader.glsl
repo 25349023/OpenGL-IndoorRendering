@@ -273,35 +273,20 @@ void main(void) {
         }
 
         if (enableFeature[7]) {
-            float sobel_x[9] = {1, 0, -1, 2, 0, -2, 1, 0, -1};
-            float sobel_y[9] = {1, 2, 1, 0, 0, 0, -1, -2, -1};
-            vec2 tex_offset = 1.0 / textureSize(tex[0], 0);
-            vec3 hori_edge = vec3(0), vert_edge = vec3(0);
-            for (int i = -1; i <= 1; i++) {
-                for (int j = -1; j <= 1; j++) {
-                    hori_edge += texture(tex[0], fs_in.texcoord + tex_offset * vec2(i, j)).rgb * sobel_x[(1-i)*3+(1-j)];
-                    vert_edge += texture(tex[0], fs_in.texcoord + tex_offset * vec2(i, j)).rgb * sobel_y[(1-i)*3+(1-j)];
-                }
-            }
-            if (any(greaterThanEqual(abs(hori_edge), vec3(0.5))) || any(greaterThanEqual(abs(vert_edge), vec3(0.5)))) {
-                color = vec3(0.0);
-            } 
-            else {
-                N = normalize(worldNormal);
-                L = normalize(directionalLight - worldVertex);
+            N = normalize(worldNormal);
+            L = normalize(directionalLight - worldVertex);
 
-                float nl = dot(N, L);
-                float multiplier = 1.0;
+            float nl = dot(N, L);
+            float multiplier = 1.0;
 
-                if (nl > 0.5) 
-                    multiplier = 1.0;
-                else if (nl > 0.0)
-                    multiplier = 0.7;
-                else 
-                    multiplier = 0.2;
+            if (nl > 0.5) 
+                multiplier = 1.0;
+            else if (nl > 0.0)
+                multiplier = 0.7;
+            else 
+                multiplier = 0.2;
 
-                color *= multiplier;
-            }
+            color *= multiplier;
         }
 
 

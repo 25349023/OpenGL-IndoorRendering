@@ -35,8 +35,8 @@ void DeferredRenderer::setupFrameBuffer()
     glEnableVertexAttribArray(1);
 
     // setup framebuffer
-    glGenFramebuffers(1, &fbo);
-    glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+    glGenFramebuffers(2, fbo);
+    glBindFramebuffer(GL_FRAMEBUFFER, fbo[0]);
 
     // Create fboDataTexture
     attachedTexs.clear();
@@ -55,6 +55,11 @@ void DeferredRenderer::setupFrameBuffer()
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT32, winSize.x, winSize.y);
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthRbo);
 
+
+    glBindFramebuffer(GL_FRAMEBUFFER, fbo[1]);
+    genFBTexture(secondOutputTex, 0);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthRbo);
+
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glBindVertexArray(0);
 }
@@ -63,9 +68,10 @@ void DeferredRenderer::teardownFrameBuffer()
 {
     glDeleteVertexArrays(1, &frameVao);
     glDeleteBuffers(1, &windowVbo);
-    glDeleteFramebuffers(1, &fbo);
+    glDeleteFramebuffers(2, fbo);
     glDeleteRenderbuffers(1, &depthRbo);
     glDeleteTextures(attachedTexs.size() - 1, attachedTexs.data() + 1);
+    glDeleteTextures(1, &secondOutputTex);
 }
 
 void DeferredRenderer::genFBTexture(GLuint& tex, int attachment)
@@ -184,7 +190,7 @@ void DeferredRenderer::shadowMapStage()
 
 void DeferredRenderer::firstStage()
 {
-    glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+    glBindFramebuffer(GL_FRAMEBUFFER, fbo[0]);
     glDrawBuffers(attachedTexs.size() - 1, drawBuffers.data());
     clear();
     fbufSP->useProgram();
@@ -217,7 +223,7 @@ void DeferredRenderer::firstStage()
 
 void DeferredRenderer::secondStage()
 {
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glBindFramebuffer(GL_FRAMEBUFFER, fbo[1]);
     clear();
     screenSP->useProgram();
 
@@ -282,6 +288,26 @@ void DeferredRenderer::secondStage()
         glActiveTexture(GL_TEXTURE0 + i);
         glBindTexture(GL_TEXTURE_2D, (i == EMISSION_MAP) ? blurredTex : attachedTexs[i]);
     }
+    glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+    glBindVertexArray(0);
+}
+
+void DeferredRenderer::thirdStage() {
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    clear();
+
+    GLuint curTex = secondOutputTex;
+
+    if (enableFeature[NON_PHOTOREALISTIC_RENDERING]) {
+        curTex = sobelEdgeDetection->renderEdge(frameVao, curTex);
+    }
+
+    postScreenSP->useProgram();
+
+    glBindVertexArray(frameVao);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, curTex);
+
     glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
     glBindVertexArray(0);
 }

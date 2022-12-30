@@ -164,5 +164,7 @@
     <None Include="src\shader\pointFragmentShader.glsl" />
     <None Include="src\shader\pointGeometryShader.glsl" />
     <None Include="src\shader\pointVertexShader.glsl" />
+    <None Include="src\shader\postFragmentShader.glsl" />
+    <None Include="src\shader\postVertexShader.glsl" />
   </ItemGroup>
 </Project>
