@@ -55,6 +55,11 @@ void DeferredRenderer::setupFrameBuffer()
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT32, winSize.x, winSize.y);
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthRbo);
 
+    // setup fbo for volumetric light
+    glGenFramebuffers(1, &volFbo);
+    glBindFramebuffer(GL_FRAMEBUFFER, volFbo);
+    genFBTexture(volTex, 0);
+    
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glBindVertexArray(0);
 }
@@ -66,6 +71,19 @@ void DeferredRenderer::teardownFrameBuffer()
     glDeleteFramebuffers(1, &fbo);
     glDeleteRenderbuffers(1, &depthRbo);
     glDeleteTextures(attachedTexs.size() - 1, attachedTexs.data() + 1);
+}
+
+glm::vec2 DeferredRenderer::getScreenCoord(glm::vec3 pos)
+{
+    glm::ivec4 viewport(0, 0, 1, 1);
+    
+    glm::vec4 vPrime = projMat * viewMat * glm::vec4(pos, 1.0);
+    vPrime /= vPrime.w;
+    
+    glm::vec2 result;
+    result.x = viewport.x + (viewport.z * vPrime.x + 1) / 2.0;
+    result.y = viewport.y + (viewport.w * vPrime.y + 1) / 2.0;
+    return result;
 }
 
 void DeferredRenderer::genFBTexture(GLuint& tex, int attachment)
@@ -204,6 +222,13 @@ void DeferredRenderer::firstStage()
         areaLight->quad.render(fbufSP, enableFeature[NORMAL_MAPPING]);
     }
 
+    if (enableFeature[VOLUMETRIC_LIGHT])
+    {
+        glUniform1i((*fbufSP)["isLight"], true);
+        volLight->render(fbufSP, enableFeature[NORMAL_MAPPING]);
+        glUniform1i((*fbufSP)["isLight"], false);
+    }
+
     if (enableFeature[BLOOM_EFFECT])
     {
         blurredTex = gaussianBlurrer->renderBlur(frameVao, attachedTexs[EMISSION_MAP]);
@@ -212,7 +237,7 @@ void DeferredRenderer::firstStage()
 
 void DeferredRenderer::secondStage()
 {
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glBindFramebuffer(GL_FRAMEBUFFER, volFbo);
     clear();
     screenSP->useProgram();
 
@@ -267,9 +292,9 @@ void DeferredRenderer::secondStage()
         glUniform1i((*screenSP)[uniformName], enableFeature[i]);
     }
 
-    glUniform1i(0, 0);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, attachedTexs[DIFFUSE_COLOR]);
+    glUniform1i(0, 0);
 
     for (int i = 1; i < GBUFFER_COUNT; ++i)
     {
@@ -281,15 +306,45 @@ void DeferredRenderer::secondStage()
     glBindVertexArray(0);
 }
 
+void DeferredRenderer::volumetricLightStage()
+{
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    clear();
+    volSP->useProgram();
+    glBindVertexArray(frameVao);
+
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, volTex);
+    glUniform1i((*volSP)["scene"], 1);
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, attachedTexs[SCATTERING_MAP]);
+    glUniform1i((*volSP)["scatterMap"], 0);
+
+    glUniform1f((*volSP)["exposure"], 0.2f);
+    glUniform1f((*volSP)["decay"], 0.96815f);
+    glUniform1f((*volSP)["density"], 0.926f);
+    glUniform1f((*volSP)["weight"], 0.58767f);
+    glUniform1f((*volSP)["sampleWeight"], 0.3f);
+    glUniform1i((*volSP)["enable"], enableFeature[VOLUMETRIC_LIGHT] && activeTex == RENDER_RESULT);
+
+    glm::vec2 volLightScreenCoord = getScreenCoord(volLight->translation);
+    glUniform2fv((*volSP)["lightPositionOnScreen"], 1, glm::value_ptr(volLightScreenCoord));
+    
+    glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+    glBindVertexArray(0);
+}
+
 void DeferredRenderer::clear()
 {
     static const float COLOR[] = { 0.1, 0.1, 0.1, 1.0 };
+    static const float NIGHT[] = { 0.19, 0.19, 0.19, 1.0 };
     static const float BLACK[] = { 0.0, 0.0, 0.0, 1.0 };
     static const float DEPTH[] = { 1.0 };
 
     for (int i = 1; i < attachedTexs.size(); ++i)
     {
-        glClearBufferfv(GL_COLOR, i - 1, (i == EMISSION_MAP) ? BLACK : COLOR);
+        glClearBufferfv(GL_COLOR, i - 1, (i == EMISSION_MAP) ? BLACK : (i == SCATTERING_MAP) ? NIGHT : COLOR);
     }
     glClearBufferfv(GL_DEPTH, 0, DEPTH);
 }

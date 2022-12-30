@@ -12,6 +12,7 @@ layout (location = 3) out vec4 diffuseColorMap;
 layout (location = 4) out vec4 specularColorMap;
 layout (location = 5) out vec4 shininessMap;
 layout (location = 6) out vec4 emissionMap;
+layout (location = 7) out vec4 lightScatteringMap;
 
 uniform int pixelProcessId;
 uniform sampler2D albedoTex;
@@ -20,6 +21,7 @@ uniform vec3 directionalLight;
 
 uniform bool hasNorm;
 uniform bool isEmissive;
+uniform bool isLight;
 
 uniform vec3 ka;
 uniform vec3 kd;
@@ -28,10 +30,6 @@ uniform float ns;
 uniform vec3 em;
 
 uniform sampler2D shadowTex;
-
-uniform vec3 lightAmbient = vec3(0.1);
-uniform vec3 lightDiffuse = vec3(0.7);
-uniform vec3 lightSpecular = vec3(0.7);
 
 vec3 check_normalize(vec3 v) {
     if (v == vec3(0.0)) {
@@ -71,5 +69,18 @@ void main() {
         emissionMap = vec4(em + 0.01, 1.0);
     } else {
         emissionMap = vec4(0.0);
+    }
+    
+    const vec4 none = vec4(vec3(0.1), 0.0);
+    if (isLight) {
+        worldSpaceVertex = none;
+        worldSpaceNormal = none;
+        ambientColorMap = none;
+        diffuseColorMap = none;
+        specularColorMap = none;
+        shininessMap = none;
+        lightScatteringMap = vec4(1.0);
+    } else {
+        lightScatteringMap = vec4(0.0, 0.0, 0.0, 1.0);
     }
 }

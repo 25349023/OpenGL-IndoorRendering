@@ -94,6 +94,8 @@
     <Content Include="src\shader\pointFragmentShader.glsl" />
     <Content Include="src\shader\pointGeometryShader.glsl" />
     <Content Include="src\shader\pointVertexShader.glsl" />
+    <Content Include="src\shader\volFragmentShader.glsl" />
+    <Content Include="src\shader\volVertexShader.glsl" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{ADA5FF44-3FBE-44D5-94ED-FFD82E3DF373}</ProjectGuid>

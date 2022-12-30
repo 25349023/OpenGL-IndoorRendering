@@ -52,20 +52,24 @@ void MyImGuiPanel::update()
         ImGui::RadioButton("Specular Color", atexPtr, SPECULAR_COLOR);
 
         ImGui::RadioButton("Emission Map", atexPtr, EMISSION_MAP);
+        ImGui::SameLine();
+        ImGui::RadioButton("Scattering Map", atexPtr, SCATTERING_MAP);
     }
 
     if (ImGui::CollapsingHeader("Blinn-Phong Shading"))
     {
         ImGui::PushID("Directional");
         ImGui::DragFloat3("Light Position",
-            glm::value_ptr(deferredRenderer->dirShadowMapper->lightEye), 0.1f);
+            glm::value_ptr(deferredRenderer->dirShadowMapper->lightEye), 0.01f);
         ImGui::DragFloat3("Light LookAt",
-            glm::value_ptr(deferredRenderer->dirShadowMapper->lightLookAt), 0.1f);
+            glm::value_ptr(deferredRenderer->dirShadowMapper->lightLookAt), 0.01f);
         ImGui::Checkbox("Enable Lighting", enable + BLINN_PHONG_SHADING);
         ImGui::Checkbox("Enable Directional Shadow Mapping", enable + DIR_SHADOW_MAPPING);
+        ImGui::Checkbox("Enable Volumetric Light", enable + VOLUMETRIC_LIGHT);
         ImGui::PopID();
     }
 
+    ImGui::Separator();
     ImGui::Checkbox("Enable Normal Mapping", enable + NORMAL_MAPPING);
     ImGui::Checkbox("Enable Bloom Effect", enable + BLOOM_EFFECT);
 

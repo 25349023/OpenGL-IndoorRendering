@@ -49,7 +49,7 @@ DeferredRenderer* deferredRenderer = nullptr;
 
 // ==============================================
 
-Model scene, trice, lightSphere;
+Model scene, trice, lightSphere, volLightSphere;
 
 GLuint vao, raw_ssbo, valid_ssbo, drawCmd_ssbo;
 
@@ -128,6 +128,24 @@ void gameLoop(GLFWwindow* window)
     }
 }
 
+glm::vec3 getVolLightPos()
+{
+    glm::vec3 t = deferredRenderer->dirShadowMapper->lightEye;
+    return glm::vec3(t.x * 5, t.y * 2.5, t.z * 5);
+}
+
+glm::vec3 getScreenCoord(glm::vec3 pos, glm::ivec4 viewport, glm::mat4 mvMat, glm::mat4 pMat)
+{
+    glm::vec4 vPrime = pMat * mvMat * glm::vec4(pos, 1.0);
+    vPrime /= vPrime.w;
+    
+    glm::vec3 result;
+    result.x = viewport.x + (viewport.z * vPrime.x + 1) / 2.0;
+    result.y = viewport.y + (viewport.w * vPrime.y + 1) / 2.0;
+    result.z = (vPrime.z + 1) / 2.0;
+    return result;
+}
+
 void initScene()
 {
     scene = Model("assets/indoor/Grey_White_Room.obj", "assets/indoor/");
@@ -141,6 +159,11 @@ void initScene()
     lightSphere.setDefaultMaterial();
     lightSphere.setEmissive(deferredRenderer->pointShadowMapper->lightColor);
 
+    volLightSphere = Model("assets/indoor/Sphere.obj", "assets/indoor/");
+    volLightSphere.setTransform(getVolLightPos(), glm::vec3(0), glm::vec3(1.0));
+    volLightSphere.setDefaultMaterial();
+    deferredRenderer->volLight = &volLightSphere;
+
     deferredRenderer->appendSceneObj(&scene);
     deferredRenderer->appendSceneObj(&trice);
     deferredRenderer->appendSceneObj(&lightSphere);
@@ -149,6 +172,10 @@ void initScene()
         glm::vec3(1.0, 0.5, -0.5), glm::vec3(glm::radians(-90.0f), 0, 0),
         glm::vec2(1.0), glm::vec3(0.6, 0.4, 0.0)
     );
+
+    // glm::vec3 temp = getScreenCoord(getVolLightPos(), glm::ivec4(0, 0, 1, 1),
+    //     deferredRenderer->viewMat, deferredRenderer->projMat);
+    // std::cout << temp.x << ", " << temp.y << ", " << temp.z << std::endl;
 }
 
 bool initializeGL()
@@ -189,6 +216,13 @@ bool initializeGL()
     {
         return false;
     }
+    
+    ShaderProgram* volShaderProgram = new ShaderProgram(
+        "src\\shader\\volVertexShader.glsl", "src\\shader\\volFragmentShader.glsl");
+    if (volShaderProgram->status() != ShaderProgramStatus::READY)
+    {
+        return false;
+    }
 
     // =================================================================
     m_imguiPanel = new MyImGuiPanel();
@@ -199,6 +233,7 @@ bool initializeGL()
     deferredRenderer = new DeferredRenderer(glm::ivec2(FRAME_WIDTH, FRAME_HEIGHT));
     deferredRenderer->fbufSP = shaderProgram;
     deferredRenderer->screenSP = screenShaderProgram;
+    deferredRenderer->volSP = volShaderProgram;
 
     deferredRenderer->dirShadowMapper = new DirectionalShadowMapper(depthShaderProgram);
     deferredRenderer->pointShadowMapper = new PointShadowMapper(pointShaderProgram);
@@ -269,11 +304,13 @@ void paintGL()
     // start new frame
     lightSphere.setTransform(deferredRenderer->pointShadowMapper->lightPos, glm::vec3(0), glm::vec3(0.22f));
     lightSphere.setEmissive(deferredRenderer->pointShadowMapper->lightColor);
+    volLightSphere.setTransform(getVolLightPos(), glm::vec3(0), glm::vec3(1.0));
     deferredRenderer->areaLight->updateParameters();
 
     deferredRenderer->shadowMapStage();
     deferredRenderer->firstStage();
     deferredRenderer->secondStage();
+    deferredRenderer->volumetricLightStage();
 
     // ===============================
 

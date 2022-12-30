@@ -23,6 +23,7 @@ enum GBuffer
     SPECULAR_COLOR,
     SHININESS,
     EMISSION_MAP,
+    SCATTERING_MAP,
     GBUFFER_COUNT
 };
 
@@ -35,6 +36,7 @@ enum Feature
     BLOOM_EFFECT,
     POINT_SHADOW_MAPPING,
     AREA_LIGHT,
+    VOLUMETRIC_LIGHT,
     FEATURE_COUNT
 };
 
@@ -54,6 +56,7 @@ public:
     void shadowMapStage();
     void firstStage();
     void secondStage();
+    void volumetricLightStage();
 
     void clear();
 
@@ -68,6 +71,7 @@ public:
     // [TODO] make fbufSP, screenSP private and initialize through the ctor
     ShaderProgram* fbufSP{};
     ShaderProgram* screenSP{};
+    ShaderProgram* volSP{};
 
     glm::mat4 projMat{ 1.0 };
     glm::mat4 viewMat{ 1.0 };
@@ -75,12 +79,15 @@ public:
     DirectionalShadowMapper* dirShadowMapper{};
     PointShadowMapper* pointShadowMapper{};
     GaussianBlurrer* gaussianBlurrer{};
-    AreaLight* areaLight;
+    AreaLight* areaLight{};
+
+    Model* volLight{};
 
 private:
     GLuint frameVao{};
     GLuint windowVbo{};
     GLuint fbo{};
+    GLuint volFbo{};
     GLuint depthRbo{};
 
     std::vector<Model*> sceneObjects;
@@ -89,6 +96,7 @@ private:
     std::vector<GLenum> drawBuffers{};
     GLuint activeTex{};
     GLuint blurredTex{};
+    GLuint volTex{};
 
     std::array<bool, FEATURE_COUNT> enableFeature{};
 
@@ -97,5 +105,6 @@ private:
     void attachNewFBTexture();
     void setupFrameBuffer();
     void teardownFrameBuffer();
+    glm::vec2 getScreenCoord(glm::vec3 pos);
     void genFBTexture(GLuint& tex, int attachment);
 };
