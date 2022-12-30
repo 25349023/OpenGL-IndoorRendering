@@ -205,7 +205,7 @@ vec3 area_light(vec3 worldVertex, vec3 N, vec3 V, vec3 kd, vec3 ks) {
     );
 
     // Evaluate LTC shading
-    vec3 diffuse = kd * ltc_evaluate(N, V, worldVertex, mat3(1), areaLightPoints);
+    vec3 diffuse = 1.2 * kd * ltc_evaluate(N, V, worldVertex, mat3(1), areaLightPoints);
     vec3 specular = ltc_evaluate(N, V, worldVertex, Minv, areaLightPoints);
 
     // GGX BRDF shadowing and Fresnel
@@ -260,7 +260,7 @@ void main(void) {
         if (enableFeature[4]) {
             vec4 b = bloom();
             if (b.w > 0.0) {
-                color = 1.5 * b.rgb;
+                color = 1.4 * b.rgb;
             } else {
                 color += b.rgb;
             }

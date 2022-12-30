@@ -9,8 +9,12 @@ MyImGuiPanel::~MyImGuiPanel() {}
 
 void MyImGuiPanel::update()
 {
-    // performance information
     ImGui::TextColored(ImVec4(0, 180, 0, 210), "FPS: %.2f", ImGui::GetIO().Framerate);
+
+    auto enable = deferredRenderer->enableFeature.data();
+    
+    ImGui::Checkbox("Enable Normal Mapping", enable + NORMAL_MAPPING);
+    ImGui::Checkbox("Enable Bloom Effect", enable + BLOOM_EFFECT);
 
     if (ImGui::CollapsingHeader("Camera settings"))
     {
@@ -37,7 +41,6 @@ void MyImGuiPanel::update()
         ImGui::RadioButton("Emission Map", atexPtr, EMISSION_MAP);
     }
 
-    auto enable = deferredRenderer->enableFeature.data();
     if (ImGui::CollapsingHeader("Blinn-Phong Shading"))
     {
         ImGui::PushID("Directional");
@@ -50,8 +53,7 @@ void MyImGuiPanel::update()
         ImGui::PopID();
     }
     
-    ImGui::Checkbox("Enable Normal Mapping", enable + NORMAL_MAPPING);
-    
+
     if (ImGui::CollapsingHeader("Point Light"))
     {
         ImGui::PushID("Point");
@@ -61,7 +63,6 @@ void MyImGuiPanel::update()
             glm::value_ptr(deferredRenderer->pointShadowMapper->lightAttenuation), 0.01f);
         ImGui::ColorEdit3("Light Color", glm::value_ptr(deferredRenderer->pointShadowMapper->lightColor));
         ImGui::Checkbox("Enable Point Light", enable + POINT_LIGHT);
-        ImGui::Checkbox("Enable Bloom Effect", enable + BLOOM_EFFECT);
         ImGui::Checkbox("Enable Point Shadow", enable + POINT_SHADOW_MAPPING);
         ImGui::PopID();
     }
