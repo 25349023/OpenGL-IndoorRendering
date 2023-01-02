@@ -216,6 +216,57 @@ vec3 area_light(vec3 worldVertex, vec3 N, vec3 V, vec3 kd, vec3 ks) {
     return to_srgb(areaLightColor * (specular + diffuse));
 }
 
+float npr(vec3 worldVertex, vec3 worldNormal, vec3 N, vec3 L) {
+    vec3 PL = normalize(pointLight - worldVertex);
+
+    float factor = 0;
+    float nl = 0;
+
+    if (enableFeature[0]) {
+        float shadow = 1.0;
+        if (enableFeature[1]) {
+            vec4 f_shadowCoord = shadowMat * vec4(worldVertex, 1.0);
+
+            float lightSpaceDepth = texture(shadowTex, f_shadowCoord.xy).x;
+            float bias = min(0.03, max(0.03 * (1.0 - dot(worldNormal, directionalLight)), 0.005));
+            shadow = f_shadowCoord.z - bias <= lightSpaceDepth ? 1.0 : 0.0;
+        }
+        nl += (shadow == 1.0 ? max(dot(N, L), 0.0) : 0.0);
+        factor += 1;
+    }
+
+    if (enableFeature[3]) {
+        float shadow = 1.0;
+        if (enableFeature[5]) {
+            vec3 lightToVertex = worldVertex - pointLight;
+            float distFromShadowMap = texture(shadowCubeTex, lightToVertex).x * far;
+
+            float bias = min(0.03, max(0.03 * (1.0 - dot(worldNormal, pointLight)), 0.005));
+            shadow = length(lightToVertex) - bias <= distFromShadowMap ? 1.0 : 0.0;
+        }
+        nl += (shadow == 1.0 ? max(dot(N, PL), 0.0) : 0.0) * 2;
+        factor += 2;
+    }
+
+    nl = factor == 0.0 ? 1.0 : nl/factor;
+
+    float multiplier = 1.0;
+
+    if (nl > 2.0/3.0) 
+        multiplier = 1.0;
+    else if (nl > 1.0/3.0)
+        multiplier = 2.0/3.0;
+    else 
+        multiplier = 1.0/3.0;
+
+    if (enableFeature[4]) {
+        vec3 emissionColor = texture(beforeBloomTex, fs_in.texcoord).rgb;
+        if (length(emissionColor) > 0.0) multiplier = 1;
+    }
+
+    return multiplier * 0.7 + 0.3;
+}
+
 void main(void) {
     if (activeTex == 0) {
         vec3 worldVertex = texture(tex[1], fs_in.texcoord).xyz;
@@ -275,56 +326,7 @@ void main(void) {
         }
 
         if (enableFeature[7]) {
-            N = normalize(worldNormal);
-            L = normalize(directionalLight - worldVertex);
-            vec3 PL = normalize(pointLight - worldVertex);
-
-            float factor = 0;
-            float nl = 0;
-
-            if (enableFeature[0]) {
-                float shadow = 1.0;
-                if (enableFeature[1]) {
-                    vec4 f_shadowCoord = shadowMat * vec4(worldVertex, 1.0);
-
-                    float lightSpaceDepth = texture(shadowTex, f_shadowCoord.xy).x;
-                    float bias = min(0.03, max(0.03 * (1.0 - dot(worldNormal, directionalLight)), 0.005));
-                    shadow = f_shadowCoord.z - bias <= lightSpaceDepth ? 1.0 : 0.0;
-                }
-                nl += (shadow == 1.0 ? max(dot(N, L), 0.0) : 0.0);
-                factor += 1;
-            }
-
-            if (enableFeature[3]) {
-                float shadow = 1.0;
-                if (enableFeature[5]) {
-                    vec3 lightToVertex = worldVertex - pointLight;
-                    float distFromShadowMap = texture(shadowCubeTex, lightToVertex).x * far;
-
-                    float bias = min(0.03, max(0.03 * (1.0 - dot(worldNormal, pointLight)), 0.005));
-                    shadow = length(lightToVertex) - bias <= distFromShadowMap ? 1.0 : 0.0;
-                }
-                nl += (shadow == 1.0 ? max(dot(N, PL), 0.0) : 0.0) * 2;
-                factor += 2;
-            }
-
-            nl = factor == 0.0 ? 1.0 : nl/factor;
-
-            float multiplier = 1.0;
-
-            if (nl > 2.0/3.0) 
-                multiplier = 1.0;
-            else if (nl > 1.0/3.0)
-                multiplier = 2.0/3.0;
-            else 
-                multiplier = 1.0/3.0;
-
-            if (enableFeature[4]) {
-                vec3 emissionColor = texture(beforeBloomTex, fs_in.texcoord).rgb;
-                if (length(emissionColor) > 0.0) multiplier = 1;
-            }
-
-            color *= multiplier * 0.7 + 0.3;
+            color *= npr(worldVertex, worldNormal, N, L);
         }
 
 
