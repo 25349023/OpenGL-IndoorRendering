@@ -6,9 +6,6 @@ in vec2 texCoords;
 
 uniform sampler2D tex;
 
-uniform bool horizontal;
-uniform float weight[5] = { 0.227027, 0.1945946, 0.1216216, 0.054054, 0.016216 };
-
 void main()
 {
     float sobel_x[9] = {1, 0, -1, 2, 0, -2, 1, 0, -1};
@@ -23,7 +20,7 @@ void main()
     }
     hori_edge = abs(hori_edge);
     vert_edge = abs(vert_edge);
-    if (hori_edge.x + hori_edge.y + hori_edge.z >= 1.0 || vert_edge.x + vert_edge.y + vert_edge.z >= 1.0) {
+    if (hori_edge.x + hori_edge.y + hori_edge.z >= 0.75 || vert_edge.x + vert_edge.y + vert_edge.z >= 0.75) {
         fragColor = vec4(0.0, 0.0, 0.0, 1.0);
     } else {
         fragColor = texture(tex, texCoords);
