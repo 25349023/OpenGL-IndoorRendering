@@ -112,6 +112,11 @@ void DeferredRenderer::updateWindowSize(glm::ivec2 ws)
         sobelEdgeDetection->teardownFrameBuffer();
         sobelEdgeDetection->setupFrameBuffer(ws);
     }
+    if (FXAAer) 
+    {
+        FXAAer->teardownFrameBuffer();
+        FXAAer->setupFrameBuffer(ws);
+    }
 }
 
 void DeferredRenderer::appendSceneObj(Model* model)
@@ -298,8 +303,11 @@ void DeferredRenderer::thirdStage() {
 
     GLuint curTex = secondOutputTex;
 
+    if (enableFeature[FXAA]) {
+        curTex = FXAAer->render(frameVao, curTex);
+    }
     if (enableFeature[NON_PHOTOREALISTIC_RENDERING]) {
-        curTex = sobelEdgeDetection->renderEdge(frameVao, curTex);
+        curTex = sobelEdgeDetection->render(frameVao, curTex);
     }
 
     postScreenSP->useProgram();

@@ -1,20 +1,20 @@
-#include "SobelEdgeDetection.h"
+#include "PostShader.h"
 
 #include <iostream>
 
 
-SobelEdgeDetection::SobelEdgeDetection(glm::ivec2 ws, ShaderProgram* sp) : edgeSP(sp)
+PostShader::PostShader(glm::ivec2 ws, ShaderProgram* sp) : SP(sp)
 {
     setupFrameBuffer(ws);
 }
 
-void SobelEdgeDetection::setupFrameBuffer(glm::ivec2 ws)
+void PostShader::setupFrameBuffer(glm::ivec2 ws)
 {
-    glGenFramebuffers(1, altFbo);
-    glGenTextures(1, altTex);
+    glGenFramebuffers(1, Fbo);
+    glGenTextures(1, Tex);
 
-    glBindFramebuffer(GL_FRAMEBUFFER, altFbo[0]);
-    glBindTexture(GL_TEXTURE_2D, altTex[0]);
+    glBindFramebuffer(GL_FRAMEBUFFER, Fbo[0]);
+    glBindTexture(GL_TEXTURE_2D, Tex[0]);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, ws.x, ws.y, 0, GL_RGBA, GL_FLOAT, NULL);
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -22,7 +22,7 @@ void SobelEdgeDetection::setupFrameBuffer(glm::ivec2 ws)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, altTex[0], 0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, Tex[0], 0);
 
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
     {
@@ -32,18 +32,18 @@ void SobelEdgeDetection::setupFrameBuffer(glm::ivec2 ws)
     
 }
 
-void SobelEdgeDetection::teardownFrameBuffer()
+void PostShader::teardownFrameBuffer()
 {
-    glDeleteFramebuffers(1, altFbo);
-    glDeleteTextures(1, altTex);
+    glDeleteFramebuffers(1, Fbo);
+    glDeleteTextures(1, Tex);
 }
 
-GLuint SobelEdgeDetection::renderEdge(GLuint windowVao, GLuint tex)
+GLuint PostShader::render(GLuint windowVao, GLuint tex)
 {
-    edgeSP->useProgram();
-    glUniform1i((*edgeSP)["tex"], 0);
+    SP->useProgram();
+    glUniform1i((*SP)["tex"], 0);
     
-    glBindFramebuffer(GL_FRAMEBUFFER, altFbo[0]);
+    glBindFramebuffer(GL_FRAMEBUFFER, Fbo[0]);
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, tex);
@@ -54,5 +54,5 @@ GLuint SobelEdgeDetection::renderEdge(GLuint windowVao, GLuint tex)
     
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-    return altTex[0];
+    return Tex[0];
 }

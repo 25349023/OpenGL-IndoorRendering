@@ -199,7 +199,14 @@ bool initializeGL()
 
     ShaderProgram* edgeShaderProgram = new ShaderProgram(
         "src\\shader\\edgeVertexShader.glsl", "src\\shader\\edgeFragmentShader.glsl");
-    if (blurShaderProgram->status() != ShaderProgramStatus::READY)
+    if (edgeShaderProgram->status() != ShaderProgramStatus::READY)
+    {
+        return false;
+    }
+
+    ShaderProgram* fxaaShaderProgram = new ShaderProgram(
+        "src\\shader\\fxaaVertexShader.glsl", "src\\shader\\fxaaFragmentShader.glsl");
+    if (fxaaShaderProgram->status() != ShaderProgramStatus::READY)
     {
         return false;
     }
@@ -219,8 +226,10 @@ bool initializeGL()
     deferredRenderer->pointShadowMapper = new PointShadowMapper(pointShaderProgram);
     deferredRenderer->gaussianBlurrer = new GaussianBlurrer(
         glm::ivec2(FRAME_WIDTH, FRAME_HEIGHT), blurShaderProgram);
-    deferredRenderer->sobelEdgeDetection = new SobelEdgeDetection(
+    deferredRenderer->sobelEdgeDetection = new PostShader(
         glm::ivec2(FRAME_WIDTH, FRAME_HEIGHT), edgeShaderProgram);
+    deferredRenderer->FXAAer = new PostShader(
+        glm::ivec2(FRAME_WIDTH, FRAME_HEIGHT), fxaaShaderProgram);
 
     // =================================================================
     // initialize camera

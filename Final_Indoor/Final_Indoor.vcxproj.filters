@@ -78,7 +78,7 @@
     <ClCompile Include="src\Shape.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\SobelEdgeDetection.cpp">
+    <ClCompile Include="src\PostShader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -149,6 +149,9 @@
     <ClInclude Include="src\SobelEdgeDetection.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\PostShader.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\shader\blurFragmentShader.glsl" />
@@ -166,5 +169,7 @@
     <None Include="src\shader\pointVertexShader.glsl" />
     <None Include="src\shader\postFragmentShader.glsl" />
     <None Include="src\shader\postVertexShader.glsl" />
+    <None Include="src\shader\fxaaFragmentShader.glsl" />
+    <None Include="src\shader\fxaaVertexShader.glsl" />
   </ItemGroup>
 </Project>

@@ -273,20 +273,24 @@ void main(void) {
         }
 
         if (enableFeature[7]) {
-            N = normalize(worldNormal);
-            L = normalize(directionalLight - worldVertex);
+            if (enableFeature[0]) {
+                N = normalize(worldNormal);
+                L = normalize(directionalLight - worldVertex);
 
-            float nl = dot(N, L);
-            float multiplier = 1.0;
+                float nl = dot(N, L);
+                float multiplier = 1.0;
 
-            if (nl > 0.5) 
-                multiplier = 1.0;
-            else if (nl > 0.0)
-                multiplier = 0.7;
-            else 
-                multiplier = 0.2;
+                if (nl > 0.5) 
+                    multiplier = 1.0;
+                else if (nl > 0.0)
+                    multiplier = 0.7;
+                else 
+                    multiplier = 0.2;
 
-            color *= multiplier;
+                color *= multiplier;
+            } else {
+                color = color; //floor(color * cel_step_count) / cel_step_count;
+            }
         }
 
 

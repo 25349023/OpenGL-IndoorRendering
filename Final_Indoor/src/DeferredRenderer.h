@@ -7,7 +7,7 @@
 #include "AreaLight.h"
 #include "DirectionalShadowMapper.h"
 #include "GaussianBlurrer.h"
-#include "SobelEdgeDetection.h"
+#include "PostShader.h"
 #include "Model.h"
 #include "PointShadowMapper.h"
 #include "Shader.h"
@@ -37,6 +37,7 @@ enum Feature
     POINT_SHADOW_MAPPING,
     AREA_LIGHT,
     NON_PHOTOREALISTIC_RENDERING,
+    FXAA,
     FEATURE_COUNT
 };
 
@@ -80,7 +81,8 @@ public:
     PointShadowMapper* pointShadowMapper{};
     GaussianBlurrer* gaussianBlurrer{};
     AreaLight* areaLight;
-    SobelEdgeDetection* sobelEdgeDetection{};
+    PostShader* sobelEdgeDetection{};
+    PostShader* FXAAer{};
 
 private:
     GLuint frameVao{};
