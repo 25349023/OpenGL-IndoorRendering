@@ -24,6 +24,7 @@ enum GBuffer
     SPECULAR_COLOR,
     SHININESS,
     EMISSION_MAP,
+    SCATTERING_MAP,
     GBUFFER_COUNT
 };
 
@@ -38,6 +39,7 @@ enum Feature
     AREA_LIGHT,
     NON_PHOTOREALISTIC_RENDERING,
     FXAA,
+    VOLUMETRIC_LIGHT,
     FEATURE_COUNT
 };
 
@@ -58,6 +60,7 @@ public:
     void firstStage();
     void secondStage();
     void thirdStage();
+    void volumetricLightStage();
 
     void clear();
 
@@ -73,6 +76,7 @@ public:
     ShaderProgram* fbufSP{};
     ShaderProgram* screenSP{};
     ShaderProgram* postScreenSP{};
+    ShaderProgram* volSP{};
 
     glm::mat4 projMat{ 1.0 };
     glm::mat4 viewMat{ 1.0 };
@@ -80,14 +84,17 @@ public:
     DirectionalShadowMapper* dirShadowMapper{};
     PointShadowMapper* pointShadowMapper{};
     GaussianBlurrer* gaussianBlurrer{};
-    AreaLight* areaLight;
+    AreaLight* areaLight{};
     PostShader* sobelEdgeDetection{};
     PostShader* FXAAer{};
+
+    Model* volLight{};
 
 private:
     GLuint frameVao{};
     GLuint windowVbo{};
     GLuint fbo[2]{};
+    GLuint volFbo{};
     GLuint depthRbo{};
 
     std::vector<Model*> sceneObjects;
@@ -97,6 +104,7 @@ private:
     GLuint activeTex{};
     GLuint blurredTex{};
     GLuint secondOutputTex{};
+    GLuint volTex{};
 
     std::array<bool, FEATURE_COUNT> enableFeature{};
 
@@ -105,5 +113,6 @@ private:
     void attachNewFBTexture();
     void setupFrameBuffer();
     void teardownFrameBuffer();
+    glm::vec2 getScreenCoord(glm::vec3 pos);
     void genFBTexture(GLuint& tex, int attachment);
 };

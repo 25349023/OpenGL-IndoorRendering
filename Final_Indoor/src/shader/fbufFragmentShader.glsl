@@ -1,6 +1,6 @@
 #version 430 core
 
-layout (location = 0) uniform sampler2D tex[8];
+layout (location = 0) uniform sampler2D tex[9];
 
 layout (location = 0) out vec4 fragColor;
 
