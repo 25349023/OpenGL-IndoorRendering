@@ -36,6 +36,7 @@
     <ClCompile Include="src\Model.cpp" />
     <ClCompile Include="src\MyImGuiPanel.cpp" />
     <ClCompile Include="src\PointShadowMapper.cpp" />
+    <ClCompile Include="src\PostShader.cpp" />
     <ClCompile Include="src\Shader.cpp" />
     <ClCompile Include="src\Shape.cpp" />
   </ItemGroup>
@@ -58,6 +59,7 @@
     <ClInclude Include="src\Model.h" />
     <ClInclude Include="src\MyImGuiPanel.h" />
     <ClInclude Include="src\PointShadowMapper.h" />
+    <ClInclude Include="src\PostShader.h" />
     <ClInclude Include="src\SceneManager.h" />
     <ClInclude Include="src\Shader.h" />
     <ClInclude Include="src\Shape.h" />
@@ -95,6 +97,25 @@
     <Content Include="src\shader\pointGeometryShader.glsl" />
     <Content Include="src\shader\pointVertexShader.glsl" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="src\shader\blurFragmentShader.glsl" />
+    <None Include="src\shader\blurVertexShader.glsl" />
+    <None Include="src\shader\depthFragmentShader.glsl" />
+    <None Include="src\shader\depthVertexShader.glsl" />
+    <None Include="src\shader\edgeFragmentShader.glsl" />
+    <None Include="src\shader\edgeVertexShader.glsl" />
+    <None Include="src\shader\fbufFragmentShader.glsl" />
+    <None Include="src\shader\fbufVertexShader.glsl" />
+    <None Include="src\shader\fxaaFragmentShader.glsl" />
+    <None Include="src\shader\fxaaVertexShader.glsl" />
+    <None Include="src\shader\oglFragmentShader.glsl" />
+    <None Include="src\shader\oglVertexShader.glsl" />
+    <None Include="src\shader\pointFragmentShader.glsl" />
+    <None Include="src\shader\pointGeometryShader.glsl" />
+    <None Include="src\shader\pointVertexShader.glsl" />
+    <None Include="src\shader\postFragmentShader.glsl" />
+    <None Include="src\shader\postVertexShader.glsl" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{ADA5FF44-3FBE-44D5-94ED-FFD82E3DF373}</ProjectGuid>
     <RootNamespace>Final_Indoor</RootNamespace>
@@ -103,7 +124,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
@@ -115,14 +136,14 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>

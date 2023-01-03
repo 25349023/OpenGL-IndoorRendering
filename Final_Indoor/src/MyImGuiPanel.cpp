@@ -95,4 +95,7 @@ void MyImGuiPanel::update()
         ImGui::Checkbox("Enable Area Light", enable + AREA_LIGHT);
         ImGui::PopID();
     }
+    ImGui::Checkbox("Enable Non-photorealistic rendering", enable + NON_PHOTOREALISTIC_RENDERING);
+    ImGui::Checkbox("Enable FXAA", enable + FXAA);
+
 }

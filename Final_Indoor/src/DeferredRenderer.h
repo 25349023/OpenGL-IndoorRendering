@@ -7,6 +7,7 @@
 #include "AreaLight.h"
 #include "DirectionalShadowMapper.h"
 #include "GaussianBlurrer.h"
+#include "PostShader.h"
 #include "Model.h"
 #include "PointShadowMapper.h"
 #include "Shader.h"
@@ -35,6 +36,8 @@ enum Feature
     BLOOM_EFFECT,
     POINT_SHADOW_MAPPING,
     AREA_LIGHT,
+    NON_PHOTOREALISTIC_RENDERING,
+    FXAA,
     FEATURE_COUNT
 };
 
@@ -54,6 +57,7 @@ public:
     void shadowMapStage();
     void firstStage();
     void secondStage();
+    void thirdStage();
 
     void clear();
 
@@ -68,6 +72,7 @@ public:
     // [TODO] make fbufSP, screenSP private and initialize through the ctor
     ShaderProgram* fbufSP{};
     ShaderProgram* screenSP{};
+    ShaderProgram* postScreenSP{};
 
     glm::mat4 projMat{ 1.0 };
     glm::mat4 viewMat{ 1.0 };
@@ -76,11 +81,13 @@ public:
     PointShadowMapper* pointShadowMapper{};
     GaussianBlurrer* gaussianBlurrer{};
     AreaLight* areaLight;
+    PostShader* sobelEdgeDetection{};
+    PostShader* FXAAer{};
 
 private:
     GLuint frameVao{};
     GLuint windowVbo{};
-    GLuint fbo{};
+    GLuint fbo[2]{};
     GLuint depthRbo{};
 
     std::vector<Model*> sceneObjects;
@@ -89,6 +96,7 @@ private:
     std::vector<GLenum> drawBuffers{};
     GLuint activeTex{};
     GLuint blurredTex{};
+    GLuint secondOutputTex{};
 
     std::array<bool, FEATURE_COUNT> enableFeature{};
 

@@ -168,6 +168,13 @@ bool initializeGL()
         return false;
     }
 
+    ShaderProgram* postScreenShaderProgram = new ShaderProgram(
+        "src\\shader\\postVertexShader.glsl", "src\\shader\\postFragmentShader.glsl");
+    if (postScreenShaderProgram->status() != ShaderProgramStatus::READY)
+    {
+        return false;
+    }
+
     ShaderProgram* depthShaderProgram = new ShaderProgram(
         "src\\shader\\depthVertexShader.glsl", "src\\shader\\depthFragmentShader.glsl");
     if (depthShaderProgram->status() != ShaderProgramStatus::READY)
@@ -190,6 +197,20 @@ bool initializeGL()
         return false;
     }
 
+    ShaderProgram* edgeShaderProgram = new ShaderProgram(
+        "src\\shader\\edgeVertexShader.glsl", "src\\shader\\edgeFragmentShader.glsl");
+    if (edgeShaderProgram->status() != ShaderProgramStatus::READY)
+    {
+        return false;
+    }
+
+    ShaderProgram* fxaaShaderProgram = new ShaderProgram(
+        "src\\shader\\fxaaVertexShader.glsl", "src\\shader\\fxaaFragmentShader.glsl");
+    if (fxaaShaderProgram->status() != ShaderProgramStatus::READY)
+    {
+        return false;
+    }
+
     // =================================================================
     m_imguiPanel = new MyImGuiPanel();
 
@@ -199,11 +220,16 @@ bool initializeGL()
     deferredRenderer = new DeferredRenderer(glm::ivec2(FRAME_WIDTH, FRAME_HEIGHT));
     deferredRenderer->fbufSP = shaderProgram;
     deferredRenderer->screenSP = screenShaderProgram;
+    deferredRenderer->postScreenSP = postScreenShaderProgram;
 
     deferredRenderer->dirShadowMapper = new DirectionalShadowMapper(depthShaderProgram);
     deferredRenderer->pointShadowMapper = new PointShadowMapper(pointShaderProgram);
     deferredRenderer->gaussianBlurrer = new GaussianBlurrer(
         glm::ivec2(FRAME_WIDTH, FRAME_HEIGHT), blurShaderProgram);
+    deferredRenderer->sobelEdgeDetection = new PostShader(
+        glm::ivec2(FRAME_WIDTH, FRAME_HEIGHT), edgeShaderProgram);
+    deferredRenderer->FXAAer = new PostShader(
+        glm::ivec2(FRAME_WIDTH, FRAME_HEIGHT), fxaaShaderProgram);
 
     // =================================================================
     // initialize camera
@@ -274,6 +300,7 @@ void paintGL()
     deferredRenderer->shadowMapStage();
     deferredRenderer->firstStage();
     deferredRenderer->secondStage();
+    deferredRenderer->thirdStage();
 
     // ===============================
 
