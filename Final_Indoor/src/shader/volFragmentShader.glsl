@@ -18,6 +18,7 @@ const int NUM_SAMPLES = 100;
 
 void main()
 {
+    fragColor = vec4(0.0, 0.0, 0.0, 1.0);
     if (enable) {
         vec2 deltaTextCoord = vec2(texCoords - lightPositionOnScreen);
         vec2 textCoo = texCoords;
