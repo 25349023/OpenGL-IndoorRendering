@@ -280,7 +280,6 @@ void DeferredRenderer::secondStage()
     glUniform3fv((*screenSP)["pointLightAttenuation"], 1, glm::value_ptr(pointShadowMapper->lightAttenuation));
     glUniform3fv((*screenSP)["pointLightColor"], 1, glm::value_ptr(pointShadowMapper->lightColor));
 
-    // [TODO] pass uniforms of area light
     glActiveTexture(GL_TEXTURE14);
     glBindTexture(GL_TEXTURE_2D, areaLight->ltc1);
     glUniform1i((*screenSP)["LTC1"], 14);

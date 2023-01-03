@@ -34,7 +34,7 @@ void updateViewMat();
 bool initializeGL();
 void resizeGL(GLFWwindow* window, int w, int h);
 void paintGL();
-void resize(const int w, const int h);
+void resize(int w, int h);
 
 glm::vec3 rotateCenterAccordingToEye(const glm::vec3& center, const glm::vec3& eye,
                                      const glm::mat4& viewMat, const float rad);
@@ -403,8 +403,10 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 void mouseScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
 {}
 
-void resize(const int w, const int h)
+void resize(int w, int h)
 {
+    w = std::max(w, 1);
+    h = std::max(h, 1);
     FRAME_WIDTH = w;
     FRAME_HEIGHT = h;
 
