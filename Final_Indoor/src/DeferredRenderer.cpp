@@ -323,11 +323,11 @@ void DeferredRenderer::secondStage()
 void DeferredRenderer::thirdStage() {
     GLuint curTex = volTex;
 
-    if (enableFeature[FXAA]) {
-        curTex = FXAAer->render(frameVao, curTex);
-    }
     if (enableFeature[NON_PHOTOREALISTIC_RENDERING]) {
         curTex = sobelEdgeDetection->render(frameVao, curTex);
+    }
+    if (enableFeature[FXAA]) {
+        curTex = FXAAer->render(frameVao, curTex);
     }
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
